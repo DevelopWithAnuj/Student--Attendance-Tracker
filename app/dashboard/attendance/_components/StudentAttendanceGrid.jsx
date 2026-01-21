@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import moment from "moment";
 import AttendanceCheckbox from "./AttendanceCheckbox";
 import { Button } from "@/components/ui/button";
 import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 function StudentAttendanceGrid({
   attendanceList,
@@ -31,6 +32,7 @@ function StudentAttendanceGrid({
   const daysInMonth = getDaysInMonth(selectedMonth);
 
   const [studentAttendance, setStudentAttendance] = useState({});
+  const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
     const newStudentAttendance = {};
@@ -108,15 +110,34 @@ function StudentAttendanceGrid({
         .finally(() => {
           setLoading(false);
         });
-    } else {
+      } else {
       toast.info("No attendance changes for past/current days to save.");
       setLoading(false);
       setIsEditing(false);
     }
   };
 
+  // Filter students based on filterText
+  const filteredStudents = useMemo(() => {
+    if (!filterText) {
+      return allStudents;
+    }
+    return allStudents.filter(student =>
+      student.name.toLowerCase().includes(filterText.toLowerCase())
+    );
+  }, [allStudents, filterText]);
+
   return (
     <div className="overflow-x-auto">
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Filter students by name..."
+          value={filterText}
+          onChange={(e) => setFilterText(e.target.value)}
+          className="max-w-xs"
+        />
+      </div>
       <table className="min-w-full bg-white border rounded-lg shadow-sm">
         <thead>
           <tr className="bg-gray-50 border-b">
@@ -150,8 +171,8 @@ function StudentAttendanceGrid({
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(allStudents) && allStudents.length > 0 ? (
-            allStudents.map((student) => (
+          {Array.isArray(filteredStudents) && filteredStudents.length > 0 ? (
+            filteredStudents.map((student) => (
               <tr key={student.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
                   {student.name}

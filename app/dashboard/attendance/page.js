@@ -19,8 +19,8 @@ function Attendance() {
 
     try {
       const attendanceResponse = await GlobalApi.GetAttendanceList(
-        selectedBranch,
-        selectedCourse,
+        selectedCourse, // Changed from selectedBranch
+        selectedBranch, // Changed from selectedCourse
         selectedYear,
         month
       );
