@@ -68,7 +68,7 @@ function Attendance() {
         setSelectedCourse(coursesData[0].name);
       } else {
         setCourseList([]);
-        setSelectedCourse(undefined);
+        setSelectedCourse(""); // Set to empty string
       }
 
       const branchesResp = await GlobalApi.GetAllBranches();
@@ -78,7 +78,7 @@ function Attendance() {
         setSelectedBranch(branchesData[0].name);
       } else {
         setBranchList([]);
-        setSelectedBranch(undefined);
+        setSelectedBranch(""); // Set to empty string
       }
 
       const yearsResp = await GlobalApi.GetAllYears();
@@ -88,7 +88,7 @@ function Attendance() {
         setSelectedYear(yearsData[0].value);
       } else {
         setYearList([]);
-        setSelectedYear(undefined);
+        setSelectedYear(""); // Set to empty string
       }
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
@@ -104,11 +104,11 @@ function Attendance() {
   }, [selectedMonth, selectedBranch, selectedCourse, selectedYear]);
 
   return (
-    <div className="p-10">
+    <div className="p-4 sm:p-6 lg:p-10">
       <h2 className="text-2xl font-bold">Attendance</h2>
       {/* {Search Option} */}
 
-      <div className="flex gap-2 my-4 p-2 border rounded-lg shadow-sm">
+      <div className="flex flex-wrap gap-4 my-4 p-4 border rounded-lg shadow-sm">
         <div className="flex gap-2 items-center ">
           <label>Select Month:</label>
           <MonthSelection
@@ -140,7 +140,7 @@ function Attendance() {
             onYearChange={(value) => setSelectedYear(value)}
           />
         </div>
-        <Button onClick={() => onSearchHandler()}>Search</Button>
+        <Button className="self-end" onClick={() => onSearchHandler()}>Search</Button>
       </div>
 
       {loading ? (

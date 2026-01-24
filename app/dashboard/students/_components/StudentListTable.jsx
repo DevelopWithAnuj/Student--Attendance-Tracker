@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { Search } from "lucide-react";
 import GlobalApi from "@/app/_services/GlobalApi"; // Keep for future use if refreshData changes
+import CustomButtons from "./CustomButtons";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -26,8 +27,8 @@ const StudentListTable = ({ studentList, courseList, branchList, yearList, refre
   // Set column definitions
   useEffect(() => {
     setColumnDef([
-      { headerName: "ID", field: "id", sortable: true, filter: true },
-      { headerName: "Name", field: "name", sortable: true, filter: true },
+      { headerName: "ID", field: "id", sortable: true, filter: true, pinned: 'left', width: 100 },
+      { headerName: "Name", field: "name", sortable: true, filter: true, pinned: 'left', width: 150 },
       { headerName: "Email", field: "email", sortable: true, filter: true },
       { headerName: "Phone", field: "phone", sortable: true, filter: true },
       {
@@ -73,8 +74,8 @@ const StudentListTable = ({ studentList, courseList, branchList, yearList, refre
 
   return (
     <div>
-      <div className="ag-theme-alpine" style={{ height: 400, width: "100%", marginTop: "20px" }}>
-      <div className="flex gap-2 items-center mb-4 max-w-sm">
+      <div className="ag-theme-alpine" style={{ height: 486, width: "100%", marginTop: "20px" }}>
+      <div className="flex gap-2 items-center mb-4 w-full sm:max-w-sm">
         <Search className="h-4 w-4 text-gray-400" />
         <Input
           type="text"

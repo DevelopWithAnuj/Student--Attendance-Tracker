@@ -27,6 +27,17 @@ const takeAttendance = (data) => axios.post("/api/attendance", data);
 const takeBulkAttendance = (data) => axios.post("/api/attendance/batch", data);
 
 const DeleteStudentRecord = (id) => axios.delete(`/api/student?id=${id}`);
+const GetDashboardSummary = (course, branch, year, month) => {
+  return axios.get("/api/dashboard", {
+    params: {
+      course: course,
+      branch: branch,
+      year: year,
+      month: month,
+    },
+  });
+};
+
 const SyncDbSequence = () => axios.post("/api/debug/sync-sequence");
 
 export default {
@@ -40,4 +51,5 @@ export default {
   takeAttendance,
   takeBulkAttendance,
   SyncDbSequence,
+  GetDashboardSummary,
 };

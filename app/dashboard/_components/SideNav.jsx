@@ -44,6 +44,8 @@ function SideNav() {
             <Image src={"/logo.svg"}
                 alt="Logo"
                 width={150} height={50}
+                className="w-[150px] h-[50px]"
+                priority
             />
 
             <hr className='my-5' />

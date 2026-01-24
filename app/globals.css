@@ -5,7 +5,7 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-foreground: oklch(0.145 0 0);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -119,4 +119,25 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hide scrollbars specifically for ag-Grid Alpine theme */
+.ag-theme-alpine {
+    --ag-scrollbar-size: 0px; /* Modern ag-Grid property for scrollbar size */
+    --ag-scrollbar-track-background-color: transparent; /* Make track transparent */
+}
+.ag-theme-alpine ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+}
+.ag-theme-alpine ::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+.ag-theme-alpine ::-webkit-scrollbar-track-piece {
+    background: transparent;
+}
+.ag-theme-alpine {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }

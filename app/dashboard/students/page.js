@@ -64,10 +64,11 @@ const Student= () => {
   };
 
   return (
-    <div className='p-7'>
-      <h2 className='font-bold text-2xl 
-      flex justify-between items-center'>
-        Students
+    <div className='p-4 sm:p-7'>
+      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
+        <h2 className='font-bold text-2xl'>
+          Students
+        </h2>
         <div className='flex items-center gap-2'>
           <Button onClick={handleSync}>Sync DB</Button>
           <AddNewStudent
@@ -77,7 +78,7 @@ const Student= () => {
             refreshData={refreshStudentList}
           />
         </div>
-      </h2>
+      </div>
 
       {loading ? (
         <div className="text-center p-10">Loading...</div>

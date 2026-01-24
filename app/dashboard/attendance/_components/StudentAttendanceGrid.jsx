@@ -7,6 +7,8 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { getUniqueRecord } from "@/app/_services/service";
+
 
 function StudentAttendanceGrid({
   attendanceList,
@@ -37,7 +39,9 @@ function StudentAttendanceGrid({
   useEffect(() => {
     const newStudentAttendance = {};
     if (attendanceList) {
-      attendanceList.forEach((record) => {
+      const uniqueAttendanceRecords = getUniqueRecord(attendanceList); // Use the function
+
+      uniqueAttendanceRecords.forEach((record) => {
         if (record.students) {
           const studentId = record.students.id;
           if (!newStudentAttendance[studentId]) {
@@ -69,16 +73,16 @@ function StudentAttendanceGrid({
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const today = moment().startOf('day'); // Get today's date, start of day for comparison
+  const today = moment().startOf("day"); // Get today's date, start of day for comparison
 
   const onSave = async () => {
     setLoading(true);
     const attendanceData = [];
     Object.keys(attendance).forEach((studentId) => {
       Object.keys(attendance[studentId]).forEach((day) => {
-        const currentDayMoment = moment(selectedMonth).date(day).startOf('day');
+        const currentDayMoment = moment(selectedMonth).date(day).startOf("day");
         // Only save attendance for past or current days, NOT future days
-        if (!currentDayMoment.isAfter(today, 'day')) {
+        if (!currentDayMoment.isAfter(today, "day")) {
           const isPresent = attendance[studentId][day];
           // Only push if there's a defined attendance state (true/false)
           if (isPresent !== undefined) {
@@ -110,7 +114,7 @@ function StudentAttendanceGrid({
         .finally(() => {
           setLoading(false);
         });
-      } else {
+    } else {
       toast.info("No attendance changes for past/current days to save.");
       setLoading(false);
       setIsEditing(false);
@@ -122,122 +126,204 @@ function StudentAttendanceGrid({
     if (!filterText) {
       return allStudents;
     }
-    return allStudents.filter(student =>
-      student.name.toLowerCase().includes(filterText.toLowerCase())
+    return allStudents.filter((student) =>
+      student.name.toLowerCase().includes(filterText.toLowerCase()),
     );
   }, [allStudents, filterText]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // Students per page
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterText]);
+
+  const paginatedStudents = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredStudents.slice(startIndex, startIndex + pageSize);
+  }, [filteredStudents, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(filteredStudents.length / pageSize);
+
   return (
-    <div className="overflow-x-auto">
-      <div className="mb-4">
+    <div>
+      {/* Filter Input */}
+      <div className="p-4 border-t border-x rounded-t-lg shadow-sm">
         <Input
           type="text"
           placeholder="Filter students by name..."
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
-          className="max-w-xs"
+          className="w-full sm:max-w-xs"
         />
       </div>
-      <table className="min-w-full bg-white border rounded-lg shadow-sm">
-        <thead>
-          <tr className="bg-gray-50 border-b">
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Student
-            </th>
-            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
-              const currentDayMoment = moment(selectedMonth).date(day).startOf('day');
-              const isPastDayHeader = currentDayMoment.isBefore(today);
-              const isFutureDayHeader = currentDayMoment.isAfter(today);
-              const isCurrentDayHeader = currentDayMoment.isSame(today, 'day');
 
-              let headerClass = "text-gray-500";
-              if (isPastDayHeader) {
-                headerClass = "text-gray-400"; // Lighter for past days
-              } else if (isFutureDayHeader) {
-                headerClass = "text-gray-400"; // Lighter for future days
-              } else if (isCurrentDayHeader) {
-                headerClass = "font-bold text-blue-600"; // Highlight current day
-              }
-
-              return (
-                <th
-                  key={day}
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${headerClass}`}
-                >
-                  {day}
+      {/* Table Container with Force-Hidden Scrollbars */}
+      <div className="overflow-hidden h-[500px] border-b border-x rounded-b-lg shadow-sm">
+        <div
+          className="overflow-auto h-full"
+          style={{
+            width: "calc(100% + 20px)",
+            height: "calc(100% + 20px)",
+          }}
+        >
+          <table className="min-w-full bg-white">
+            {/* Table Header */}
+            <thead className="sticky top-0 z-20 bg-gray-50 border-b">
+              <tr>
+                {/* Sticky Corner Cell */}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 z-30 bg-gray-50">
+                  Student
                 </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(filteredStudents) && filteredStudents.length > 0 ? (
-            filteredStudents.map((student) => (
-              <tr key={student.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
-                  {student.name}
-                </td>
+                {/* Date Cells */}
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
                   (day) => {
-                    const recordedAttendance = studentAttendance[student.id]?.attendance[day];
-                    const pendingAttendance = attendance[student.id]?.[day];
-
-                    const displayAttendance = pendingAttendance !== undefined ? pendingAttendance : recordedAttendance;
-
-                    const currentDayMoment = moment(selectedMonth).date(day).startOf('day');
-                    const isFutureDay = currentDayMoment.isAfter(today); // Declare here!
-
-                    let renderContent; // This will hold the JSX for the cell
-
-                    // Determine if the checkbox should be interactive
-                    // Allow interaction if in edit mode AND NOT a future day
-                    const canInteractWithDay = isEditing && !isFutureDay;
-
-                    if (canInteractWithDay) {
-                      renderContent = (
-                        <AttendanceCheckbox
-                          studentId={student.id}
-                          day={day}
-                          onAttendanceChange={onAttendanceChange}
-                          initialPresent={displayAttendance}
-                        />
-                      );
-                    } else {
-                      // If not interactive (either not editing OR it's a future day), display P, A, or '-'
-                      if (displayAttendance === true) {
-                        renderContent = <span className="font-bold text-green-700">P</span>;
-                      } else if (displayAttendance === false) {
-                        renderContent = <span className="font-bold text-red-400">A</span>;
-                      } else {
-                        renderContent = "-"; // No record and not interactive
-                      }
+                    const currentDayMoment = moment(selectedMonth)
+                      .date(day)
+                      .startOf("day");
+                    const isPastDayHeader = currentDayMoment.isBefore(today);
+                    const isFutureDayHeader = currentDayMoment.isAfter(today);
+                    const isCurrentDayHeader = currentDayMoment.isSame(
+                      today,
+                      "day",
+                    );
+                    let headerClass = "text-gray-500";
+                    if (isPastDayHeader || isFutureDayHeader) {
+                      headerClass = "text-gray-400";
+                    } else if (isCurrentDayHeader) {
+                      headerClass = "font-bold text-blue-600";
                     }
-
                     return (
-                      <td
+                      <th
                         key={day}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r text-center"
+                        className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${headerClass}`}
                       >
-                        {renderContent}
-                      </td>
+                        {day}
+                      </th>
                     );
                   },
                 )}
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={daysInMonth + 1}
-                className="px-4 py-2 text-center text-gray-500"
-              >
-                No students found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      <div className="mt-4 flex gap-2">
+            </thead>
+
+            {/* Table Body */}
+            <tbody className="divide-y divide-gray-200">
+              {Array.isArray(paginatedStudents) &&
+              paginatedStudents.length > 0 ? (
+                paginatedStudents.map((student) => (
+                  <tr key={student.id} className="group hover:bg-gray-50">
+                    {/* Sticky Student Name Cell */}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 z-10 bg-white group-hover:bg-gray-50 border-r">
+                      {student.name}
+                    </td>
+                    {/* Attendance Cells */}
+                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
+                      (day) => {
+                        const recordedAttendance =
+                          studentAttendance[student.id]?.attendance[day];
+                        const pendingAttendance =
+                          attendance[student.id]?.[day];
+                        const displayAttendance =
+                          pendingAttendance !== undefined
+                            ? pendingAttendance
+                            : recordedAttendance;
+                        const currentDayMoment = moment(selectedMonth)
+                          .date(day)
+                          .startOf("day");
+                        const isFutureDay = currentDayMoment.isAfter(today);
+                        let renderContent;
+                        const canInteractWithDay = isEditing && !isFutureDay;
+                        if (canInteractWithDay) {
+                          renderContent = (
+                            <AttendanceCheckbox
+                              studentId={student.id}
+                              day={day}
+                              onAttendanceChange={onAttendanceChange}
+                              initialPresent={displayAttendance}
+                            />
+                          );
+                        } else {
+                          if (displayAttendance === true) {
+                            renderContent = (
+                              <span className="font-bold text-green-700">
+                                P
+                              </span>
+                            );
+                          } else if (displayAttendance === false) {
+                            renderContent = (
+                              <span className="font-bold text-red-400">
+                                A
+                              </span>
+                            );
+                          } else {
+                            renderContent = "-";
+                          }
+                        }
+                        return (
+                          <td
+                            key={day}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center border-r"
+                          >
+                            {renderContent}
+                          </td>
+                        );
+                      },
+                    )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={daysInMonth + 1}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    No students found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="mt-4 flex flex-wrap justify-between items-center gap-4">
+        <span className="text-sm text-gray-700">
+          Showing{" "}
+          <strong>
+            {filteredStudents.length > 0
+              ? (currentPage - 1) * pageSize + 1
+              : 0}
+          </strong>{" "}
+          to{" "}
+          <strong>
+            {Math.min(currentPage * pageSize, filteredStudents.length)}
+          </strong>{" "}
+          of <strong>{filteredStudents.length}</strong> students
+        </span>
+        {totalPages > 1 && (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-4 flex flex-wrap gap-2">
         {!isEditing && (
           <Button onClick={() => setIsEditing(true)}>Edit Attendance</Button>
         )}
