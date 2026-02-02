@@ -89,6 +89,7 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
               <Input
                 placeholder="jonedoe@example.com"
                 id="email"
+                type="email"
                 className="col-span-3"
                 {...register("email", { required: true })}
               />

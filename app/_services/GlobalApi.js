@@ -23,10 +23,10 @@ const GetAttendanceList = (courses, branches, years, month) => {
 };
 
 const takeAttendance = (data) => axios.post("/api/attendance", data);
-
 const takeBulkAttendance = (data) => axios.post("/api/attendance/batch", data);
 
 const DeleteStudentRecord = (id) => axios.delete(`/api/student?id=${id}`);
+const UpdateStudent = (id, data) => axios.put(`/api/student?id=${id}`, data);
 const GetDashboardSummary = (course, branch, year, month) => {
   return axios.get("/api/dashboard", {
     params: {
@@ -47,6 +47,7 @@ export default {
   CreateNewStudent,
   GetAllStudents,
   DeleteStudentRecord,
+  UpdateStudent,
   GetAttendanceList,
   takeAttendance,
   takeBulkAttendance,

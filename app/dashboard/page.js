@@ -9,6 +9,8 @@ import GlobalApi from "../_services/GlobalApi";
 import moment from "moment";
 import StatusList from "./_components/StatusList";
 import BarChartComponent from "./_components/BarChartComponent";
+import PieChartComponent from "./_components/PieChartComponent";
+import { LayoutDashboard } from "lucide-react";
 
 const Dashboard = () => {
   const { setTheme } = useTheme();
@@ -25,7 +27,6 @@ const Dashboard = () => {
   const [dashboardSummary, setDashboardSummary] = useState({});
 
   useEffect(() => {
-    setTheme("light");
     fetchAllDropdownData(); // Fetch initial dropdown data
   }, []);
 
@@ -62,7 +63,10 @@ const Dashboard = () => {
         setSelectedYear("");
       }
     } catch (error) {
-      console.error("Error fetching dropdown data for Dashboard:", error);
+      console.error(
+        "Error fetching dropdown data for Dashboard:",
+        error.response?.data?.details || error.message,
+      );
     } finally {
       setLoading(false); // Set loading false after fetch
     }
@@ -124,7 +128,9 @@ const Dashboard = () => {
   return (
     <div className="p-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-bold text-2xl">Dashboard</h2>
+        <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
+        <LayoutDashboard className="h-8 w-8 text-gray-600" />
+          Dashboard</h2>
 
         <div className="flex flex-wrap items-center gap-4">
           <MonthSelection
@@ -157,12 +163,12 @@ const Dashboard = () => {
         <StatusList attendanceList={attendanceList} />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <div className="md:col-span-2">
           <BarChartComponent attendance={attendanceList} />
         </div>
-        <div>
-          {/* This div is empty, can be removed if not used for other content */}
+        <div className="md:col-span-1">
+          <PieChartComponent attendance={attendanceList} />
         </div>
       </div>
     </div>

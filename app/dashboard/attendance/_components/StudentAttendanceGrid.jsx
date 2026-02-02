@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { getUniqueRecord } from "@/app/_services/service";
 
-
 function StudentAttendanceGrid({
   attendanceList,
   selectedMonth,
@@ -35,6 +34,8 @@ function StudentAttendanceGrid({
 
   const [studentAttendance, setStudentAttendance] = useState({});
   const [filterText, setFilterText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // Students per page
 
   useEffect(() => {
     const newStudentAttendance = {};
@@ -131,8 +132,36 @@ function StudentAttendanceGrid({
     );
   }, [allStudents, filterText]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10; // Students per page
+  const exportToCSV = () => {
+    const headers = ["Student Name", ...Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)];
+    const csvContent = [
+      headers.join(","),
+      ...paginatedStudents.map(student => {
+        const row = [student.name];
+        for (let day = 1; day <= daysInMonth; day++) {
+          const recordedAttendance = studentAttendance[student.id]?.attendance[day];
+          const pendingAttendance = attendance[student.id]?.[day];
+          const displayAttendance = pendingAttendance !== undefined ? pendingAttendance : recordedAttendance;
+          let status = "";
+          if (displayAttendance === true) status = "Present";
+          else if (displayAttendance === false) status = "Absent";
+          else status = "Not Marked";
+          row.push(status);
+        }
+        return row.join(",");
+      })
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `attendance_${selectedMonth.format("YYYY_MM")}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Reset to page 1 when filter changes
   useEffect(() => {
@@ -168,12 +197,12 @@ function StudentAttendanceGrid({
             height: "calc(100% + 20px)",
           }}
         >
-          <table className="min-w-full bg-white">
+          <table className="min-w-full bg-background">
             {/* Table Header */}
-            <thead className="sticky top-0 z-20 bg-gray-50 border-b">
+            <thead className="sticky top-0 z-20 bg-background border-border">
               <tr>
                 {/* Sticky Corner Cell */}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 z-30 bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 z-30 bg-background border-border">
                   Student
                 </th>
                 {/* Date Cells */}
@@ -212,9 +241,9 @@ function StudentAttendanceGrid({
               {Array.isArray(paginatedStudents) &&
               paginatedStudents.length > 0 ? (
                 paginatedStudents.map((student) => (
-                  <tr key={student.id} className="group hover:bg-gray-50">
+                  <tr key={student.id} className="group hover:bg-secondary">
                     {/* Sticky Student Name Cell */}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 z-10 bg-white group-hover:bg-gray-50 border-r">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground sticky left-0 z-10 bg-background group-hover:bg-primary border-r">
                       {student.name}
                     </td>
                     {/* Attendance Cells */}
@@ -332,6 +361,9 @@ function StudentAttendanceGrid({
             {loading ? "Saving..." : "Save Attendance"}
           </Button>
         )}
+        <Button onClick={exportToCSV} variant="outline">
+          Export to CSV
+        </Button>
       </div>
     </div>
   );

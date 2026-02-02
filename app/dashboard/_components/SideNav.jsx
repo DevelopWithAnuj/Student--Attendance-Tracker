@@ -40,52 +40,53 @@ function SideNav() {
         console.log("Current path:", path);
     }, [path]);
     return (
-        <div className='border shadow-md h-screen p-5'>
-            <Image src={"/logo.svg"}
-                alt="Logo"
-                width={150} height={50}
-                className="w-[150px] h-[50px]"
-                priority
-            />
+      <div className="border shadow-md h-screen p-5 w-60 relative">
+        <Image
+          src={"/logo1.svg"}
+          alt="Logo"
+          width={150}
+          height={50}
+          className="w-[150px] h-[50px]"
+          priority
+        />
 
-            <hr className='my-5' />
+        <hr className="my-5 border-1 border-gray-300" />
 
-            {menuList.map((menu) => (
-                <Link href={menu.path} key={menu.id}>
-                    <h2
-                        className={`flex items-center
-                         gap-3 text-gray-600 text-md
+        {menuList.map((menu) => (
+          <Link href={menu.path} key={menu.id}>
+            <h2
+              className={`flex items-center
+                         gap-3 text-foreground text-md
                          p-4 cursor-pointer 
                          hover:bg-primary
                          hover:text-white
                          rounded-md my-2
-                         ${path==menu.path && 'bg-primary text-white'}`}
-                    >
-                        <menu.icon />
-                        {menu.name}
-                    </h2>
-                </Link>
-            ))}
+                         ${path == menu.path && "bg-primary text-white"}`}
+            >
+              <menu.icon />
+              {menu.name}
+            </h2>
+          </Link>
+        ))}
 
-            <div className='absolute bottom-10 left-0 w-full p-5 flex items-center gap-3'>
-                {user?.picture ? (
-                    <Image
-                        src={user?.picture || "/default-avatar.png"}
-                        alt="Profile"
-                        width={35} height={35}
-                        className='rounded-full'
-                    />
-                ) : null}
-                <div>
-                    <h2 className='text-sm font-semibold'>
-                        {user?.given_name} {user?.family_name}
-                    </h2>
-                    <h2 className='text-xs text-gray-500'>
-                        {user?.email}
-                    </h2>
-                </div>
-            </div>
+        <div className="absolute bottom-10 left-0 w-full p-5 flex items-center gap-3">
+          {user?.picture ? (
+            <Image
+              src={user?.picture || "/default-avatar.png"}
+              alt="Profile"
+              width={35}
+              height={35}
+              className="rounded-full"
+            />
+          ) : null}
+          <div>
+            <h2 className="text-sm font-semibold">
+              {user?.given_name} {user?.family_name}
+            </h2>
+            <h2 className="text-xs text-muted-foreground">{user?.email}</h2>
+          </div>
         </div>
+      </div>
     );
 };
 

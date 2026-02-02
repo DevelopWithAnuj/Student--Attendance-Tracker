@@ -1,4 +1,3 @@
-import { int } from "drizzle-orm/mysql-core";
 import { pgTable, serial, text, varchar, integer, length, boolean, timestamp, date, PgInteger } from "drizzle-orm/pg-core";
 
 // students table

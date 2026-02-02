@@ -5,24 +5,62 @@ import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 import { Input } from "@/components/ui/input";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { Search } from "lucide-react";
-import GlobalApi from "@/app/_services/GlobalApi"; // Keep for future use if refreshData changes
+import GlobalApi from "@/app/_services/GlobalApi";
 import CustomButtons from "./CustomButtons";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const StudentListTable = ({ studentList, courseList, branchList, yearList, refreshData }) => {
+const StudentListTable = ({ studentList, refreshData }) => {
   const [rowData, setRowData] = useState([]);
+  const [courseList, setCourseList] = useState([]);
+  const [branchList, setBranchList] = useState([]);
+  const [yearList, setYearList] = useState([]);
   const gridRef = useRef(null);
   const gridApiRef = useRef(null);
   const [columnDef, setColumnDef] = useState([]);
 
 
+  // Fetch lists on mount
+  useEffect(() => {
+    const fetchLists = async () => {
+      try {
+        const [coursesRes, branchesRes, yearsRes] = await Promise.all([
+          GlobalApi.GetAllCourses(),
+          GlobalApi.GetAllBranches(),
+          GlobalApi.GetAllYears(),
+        ]);
+        setCourseList(coursesRes.data.result || []);
+        setBranchList(branchesRes.data.result || []);
+        setYearList(yearsRes.data.result || []);
+      } catch (error) {
+        console.error("Failed to fetch lists:", error);
+      }
+    };
+    fetchLists();
+  }, []);
+
   // Set row data from studentList prop
   useEffect(() => {
     if (studentList) {
-      setRowData(studentList);
+      const transformedData = studentList.map(student => {
+        const courseId = student.courseId || student.course?.id;
+        const branchId = student.branchId || student.branch?.id;
+        const yearId = student.yearId || student.year?.id;
+  
+        const courseName = courseList.find(c => c.id === courseId)?.name;
+        const branchName = branchList.find(b => b.id === branchId)?.name;
+        const yearValue = yearList.find(y => y.id === yearId)?.value;
+  
+        return {
+          ...student,
+          course: courseName || (typeof student.course === 'string' ? student.course : courseId),
+          branch: branchName || (typeof student.branch === 'string' ? student.branch : branchId),
+          year: yearValue || (typeof student.year === 'string' ? student.year : yearId),
+        };
+      });
+      setRowData(transformedData);
     }
-  }, [studentList]);
+  }, [studentList, courseList, branchList, yearList]);
 
   // Set column definitions
   useEffect(() => {
@@ -56,15 +94,15 @@ const StudentListTable = ({ studentList, courseList, branchList, yearList, refre
         cellRenderer: (params) => (
           <CustomButtons 
             rowData={params.data}
-            courses={courseList} // Use props
-            branches={branchList} // Use props
-            years={yearList} // Use props
-            onDeleteSuccess={refreshData} // Use prop
+            courses={courseList}
+            branches={branchList}
+            years={yearList}
+            onDeleteSuccess={refreshData}
           />
         ),
       },
     ]);
-  }, [courseList, branchList, yearList, studentList, refreshData]); // Add refreshData to dependencies
+  }, [courseList, branchList, yearList, refreshData]);
 
   const onGridReady = (params) => {
     gridApiRef.current = params.api;
@@ -100,7 +138,7 @@ const StudentListTable = ({ studentList, courseList, branchList, yearList, refre
           pagination={true}
           paginationPageSize={10}
           paginationAutoPageSize={true}
-          onGridReady={onGridReady} // ensure this is set
+          onGridReady={onGridReady} 
         />
       </div>
     </div>

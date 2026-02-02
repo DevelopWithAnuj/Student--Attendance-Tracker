@@ -5,7 +5,7 @@
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: oklch(0.145 0 0);
+  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -79,13 +79,13 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --background: oklch(29.512% 0.00901 285.789);
+  --foreground: oklch(100% 0.00011 271.152);
+  --card: oklch(33.718% 0.01089 271.09);
+  --card-foreground: oklch(75.246% 0.00226 15.124);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: oklch(62.358% 0.20636 255.147);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -121,10 +121,11 @@
   }
 }
 
+
 /* Hide scrollbars specifically for ag-Grid Alpine theme */
 .ag-theme-alpine {
     --ag-scrollbar-size: 0px; /* Modern ag-Grid property for scrollbar size */
-    --ag-scrollbar-track-background-color: transparent; /* Make track transparent */
+    --ag-scrollbar-track-background-color: transparent; 
 }
 .ag-theme-alpine ::-webkit-scrollbar {
     width: 0px;
@@ -140,4 +141,10 @@
 .ag-theme-alpine {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
+}
+
+@layer utilities {
+  .text-foreground {
+    color: var(--color-foreground);
+  }
 }

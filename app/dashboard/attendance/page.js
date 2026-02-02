@@ -19,8 +19,8 @@ function Attendance() {
 
     try {
       const attendanceResponse = await GlobalApi.GetAttendanceList(
-        selectedCourse, // Changed from selectedBranch
-        selectedBranch, // Changed from selectedCourse
+        selectedCourse, 
+        selectedBranch,
         selectedYear,
         month
       );
@@ -116,7 +116,7 @@ function Attendance() {
             onMonthChange={(value) => setSelectedMonth(value)} // Pass callback
           />
         </div>
-        <div className="flex gap-2 items-center ">
+        <div className="flex gap-2 items-center bg-background">
           <label>Select Course:</label>
           <CourseSelection
             courseList={courseList}
@@ -124,7 +124,7 @@ function Attendance() {
             onCourseChange={handleCourseChange}
           />
         </div>
-        <div className="flex gap-2 items-center ">
+        <div className="flex gap-2 items-center bg-background">
           <label>Select Branch:</label>
           <BranchSelection
             branchList={branchList}
@@ -132,7 +132,7 @@ function Attendance() {
             onBranchChange={(value) => setSelectedBranch(value)}
           />
         </div>
-        <div className="flex gap-2 items-center ">
+        <div className="flex gap-2 items-center bg-background">
           <label>Select Year:</label>
           <YearSelection
             yearList={yearList}

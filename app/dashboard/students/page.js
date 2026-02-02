@@ -85,9 +85,6 @@ const Student= () => {
       ) : (
         <StudentListTable
           studentList={studentList}
-          courseList={courseList}
-          branchList={branchList}
-          yearList={yearList}
           refreshData={refreshStudentList}
         />
       )}
