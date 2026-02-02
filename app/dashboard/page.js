@@ -126,10 +126,10 @@ const Dashboard = () => {
   }, [selectedMonth, selectedBranch, selectedCourse, selectedYear]);
 
   return (
-    <div className="p-10">
+    <div className="p-4 sm:p-6 md:p-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
-        <LayoutDashboard className="h-8 w-8 text-gray-600" />
+        <LayoutDashboard className="h-8 w-8 text-muted-foreground" />
           Dashboard</h2>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -155,7 +155,7 @@ const Dashboard = () => {
         </div>
       </div>
       {loading ? (
-        <div className="text-center p-5 text-lg">
+        <div className="text-center p-5 text-lg text-muted-foreground">
           Loading Attendance Data...
         </div>
       ) : (
@@ -163,7 +163,7 @@ const Dashboard = () => {
         <StatusList attendanceList={attendanceList} />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         <div className="md:col-span-2">
           <BarChartComponent attendance={attendanceList} />
         </div>

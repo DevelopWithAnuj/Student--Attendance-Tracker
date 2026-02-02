@@ -12,7 +12,7 @@ const Settings = () => {
   const { user } = useKindeBrowserClient();
 
   return (
-    <div className="p-10">
+    <div className="p-4 sm:p-6 md:p-10">
       <div className="flex items-center gap-3 mb-8">
         <SettingsIcon className="h-8 w-8 text-foreground" />
         <h2 className="text-3xl font-bold text-foreground">Settings</h2>
@@ -97,11 +97,11 @@ const Settings = () => {
             </div>
             <div>
               <h4 className="font-semibold text-lg">Last Updated</h4>
-              <p className="text-gray-600">February 2026</p>
+              <p className="text-muted-foreground">February 2026</p>
             </div>
             <div>
               <h4 className="font-semibold text-lg">Developer</h4>
-              <p className="text-gray-600">Student Attendance Tracker Team</p>
+              <p className="text-muted-foreground">Student Attendance Tracker Team</p>
             </div>
           </div>
         </Card>

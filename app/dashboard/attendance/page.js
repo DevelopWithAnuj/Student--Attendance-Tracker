@@ -104,20 +104,20 @@ function Attendance() {
   }, [selectedMonth, selectedBranch, selectedCourse, selectedYear]);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10">
+    <div className="p-4 sm:p-6 md:p-10">
       <h2 className="text-2xl font-bold">Attendance</h2>
       {/* {Search Option} */}
 
       <div className="flex flex-wrap gap-4 my-4 p-4 border rounded-lg shadow-sm">
         <div className="flex gap-2 items-center ">
-          <label>Select Month:</label>
+          <label className="text-foreground">Select Month:</label>
           <MonthSelection
             selectedMonth={selectedMonth}
             onMonthChange={(value) => setSelectedMonth(value)} // Pass callback
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label>Select Course:</label>
+          <label className="text-foreground">Select Course:</label>
           <CourseSelection
             courseList={courseList}
             selectedCourse={selectedCourse}
@@ -125,7 +125,7 @@ function Attendance() {
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label>Select Branch:</label>
+          <label className="text-foreground">Select Branch:</label>
           <BranchSelection
             branchList={branchList}
             selectedBranch={selectedBranch}
@@ -133,7 +133,7 @@ function Attendance() {
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label>Select Year:</label>
+          <label className="text-foreground">Select Year:</label>
           <YearSelection
             yearList={yearList}
             selectedYear={selectedYear}

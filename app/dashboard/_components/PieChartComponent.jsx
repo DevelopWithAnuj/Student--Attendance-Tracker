@@ -46,9 +46,9 @@ function PieChartComponent({ attendance }) {
   }, [attendance]);
 
   return (
-    <div className="mt-4 p-5 border rounded-lg shadow-sm">
+    <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm">
       <h3 className="text-xl my-2 font-semibold mb-2">Monthly Attendance Summary</h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" aspect={1}>
         {data && data.length > 0 && (data[0].value > 0 || data[1].value > 0) ? (
           <PieChart>
             <Pie
@@ -64,7 +64,7 @@ function PieChartComponent({ attendance }) {
             <Legend />
           </PieChart>
         ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
+          <div className="items-center justify-center h-full text-muted-foreground">
             No data available
           </div>
         )}

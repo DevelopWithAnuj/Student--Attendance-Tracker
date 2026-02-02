@@ -19,9 +19,12 @@ const config = {
         "2xl": "1400px",
       },
     },
-    extend: {
-      colors: {
-        "custom-sky-light": "#bae6fd",
+          extend: {
+            boxShadow: {
+              'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // default
+              'dark-sm': '0 1px 2px 0 rgba(255, 255, 255, 0.05)', // subtle white shadow for dark mode
+            },
+            colors: {        "custom-sky-light": "#bae6fd",
         "custom-blue-light": "#93c5fd",
         "custom-sky-dark": "#0c4a6e",
         "custom-blue-dark": "#1e3a8a",

@@ -49,9 +49,9 @@ function BarChartComponent({ attendance }) {
     setData(chartData);
   };
   return (
-    <div className="mt-4 p-5 border rounded-lg shadow-sm">
+    <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm">
       <h3 className="text-xl my-2 font-semibold mb-2">Daily Attendance Chart</h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" aspect={2}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="day" />
