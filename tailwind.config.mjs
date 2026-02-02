@@ -21,10 +21,10 @@ const config = {
     },
     extend: {
       colors: {
-        "sky-150": "#bae6fd",
-        "blue-350": "#93c5fd",
-        "sky-900": "#0c4a6e",
-        "blue-900": "#1e3a8a",
+        "custom-sky-light": "#bae6fd",
+        "custom-blue-light": "#93c5fd",
+        "custom-sky-dark": "#0c4a6e",
+        "custom-blue-dark": "#1e3a8a",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

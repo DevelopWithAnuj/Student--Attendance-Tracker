@@ -58,10 +58,10 @@ function BarChartComponent({ attendance }) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="presentCount" fill="#8884d8" name="Present" />
-          <Bar dataKey="absentCount" fill="#82ca9d" name="Absent" />
+          <Bar dataKey="presentCount" fill="var(--color-chart-1)" name="Present" />
+          <Bar dataKey="absentCount" fill="var(--color-chart-2)" name="Absent" />
           {data.length === 0 && (
-            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="#6b7280">
+            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="var(--color-muted-foreground)">
               No data available
             </text>
           )}

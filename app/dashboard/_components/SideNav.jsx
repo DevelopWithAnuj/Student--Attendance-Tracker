@@ -59,9 +59,9 @@ function SideNav() {
                          gap-3 text-foreground text-md
                          p-4 cursor-pointer 
                          hover:bg-primary
-                         hover:text-white
+                         hover:text-primary-foreground
                          rounded-md my-2
-                         ${path == menu.path && "bg-primary text-white"}`}
+                         ${path == menu.path && "bg-primary text-primary-foreground"}`}
             >
               <menu.icon />
               {menu.name}

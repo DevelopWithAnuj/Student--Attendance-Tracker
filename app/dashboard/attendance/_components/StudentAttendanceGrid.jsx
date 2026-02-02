@@ -202,7 +202,7 @@ function StudentAttendanceGrid({
             <thead className="sticky top-0 z-20 bg-background border-border">
               <tr>
                 {/* Sticky Corner Cell */}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 z-30 bg-background border-border">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky left-0 z-30 bg-background border-border">
                   Student
                 </th>
                 {/* Date Cells */}
@@ -219,9 +219,9 @@ function StudentAttendanceGrid({
                     );
                     let headerClass = "text-gray-500";
                     if (isPastDayHeader || isFutureDayHeader) {
-                      headerClass = "text-gray-400";
+                      headerClass = "text-gray-400 dark:text-gray-500";
                     } else if (isCurrentDayHeader) {
-                      headerClass = "font-bold text-blue-600";
+                      headerClass = "font-bold text-blue-600 dark:text-blue-400";
                     }
                     return (
                       <th
@@ -275,13 +275,13 @@ function StudentAttendanceGrid({
                         } else {
                           if (displayAttendance === true) {
                             renderContent = (
-                              <span className="font-bold text-green-700">
+                              <span className="font-bold text-green-700 dark:text-green-400">
                                 P
                               </span>
                             );
                           } else if (displayAttendance === false) {
                             renderContent = (
-                              <span className="font-bold text-red-400">
+                              <span className="font-bold text-red-400 dark:text-red-300">
                                 A
                               </span>
                             );
@@ -292,7 +292,7 @@ function StudentAttendanceGrid({
                         return (
                           <td
                             key={day}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center border-r"
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center border-r"
                           >
                             {renderContent}
                           </td>

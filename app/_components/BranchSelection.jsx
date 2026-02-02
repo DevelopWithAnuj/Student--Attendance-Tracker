@@ -8,7 +8,7 @@ function BranchSelection({ selectedBranch, onBranchChange, branchList }) {
     <div className="">
       <select
         id="branch"
-        className="col-span-3 border p-2 rounded-lg"
+        className="col-span-3 border border-input p-2 rounded-lg bg-background text-foreground"
         value={selectedBranch}
         onChange={(e) => onBranchChange(e.target.value)}
       >

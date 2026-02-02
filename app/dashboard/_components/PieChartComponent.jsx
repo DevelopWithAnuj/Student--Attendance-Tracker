@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, ResponsiveContainer, Legend } from 'recharts';
 
-const COLORS = ['#00C49F', '#FF8042']; // Green for Present, Orange for Absent
+const COLORS = ['var(--color-chart-3)', 'var(--color-chart-4)'];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -10,7 +10,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+    <text x={x} y={y} fill="var(--color-foreground)" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
@@ -64,7 +64,7 @@ function PieChartComponent({ attendance }) {
             <Legend />
           </PieChart>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             No data available
           </div>
         )}

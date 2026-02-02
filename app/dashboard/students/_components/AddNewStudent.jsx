@@ -112,7 +112,7 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
               </label>
               <select
                 id="course"
-                className="col-span-3 border p-2 rounded-md"
+                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
                 {...register("courseId", { required: true })}
               >
                 {Array.isArray(courseList) &&
@@ -129,7 +129,7 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
               </label>
               <select
                 id="branch"
-                className="col-span-3 border p-2 rounded-md"
+                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
                 {...register("branchId", { required: true })}
               >
                 {Array.isArray(branchList) &&
@@ -146,7 +146,7 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
               </label>
               <select
                 id="year"
-                className="col-span-3 border p-2 rounded-md"
+                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
                 {...register("yearId", { required: true })}
               >
                 {Array.isArray(yearList) &&

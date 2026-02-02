@@ -8,7 +8,7 @@ function YearSelection({ selectedYear, onYearChange, yearList }) {
     <div className="">
       <select
         id="year"
-        className="col-span-3 border p-2 rounded-lg"
+        className="col-span-3 border border-input p-2 rounded-lg bg-background text-foreground"
         value={selectedYear}
         onChange={(e) => onYearChange(e.target.value)}
       >

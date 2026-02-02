@@ -8,7 +8,7 @@ function CourseSelection({ selectedCourse, onCourseChange, courseList }) {
     <div className="">
       <select
         id="course"
-        className="col-span-3 border p-2 rounded-lg"
+        className="col-span-3 border border-input p-2 rounded-lg bg-background text-foreground"
         value={selectedCourse}
         onChange={(e) => onCourseChange(e.target.value)}
       >
