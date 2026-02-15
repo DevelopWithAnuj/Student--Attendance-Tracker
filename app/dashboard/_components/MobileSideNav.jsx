@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
+import { LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { menuList } from './SideNav'; // Import menuList from SideNav
-import { GraduationCap, Hand, LayoutIcon, SettingsIcon } from 'lucide-react'; // Import icons needed for menuList
+import { GraduationCap, Hand, LayoutIcon, SettingsIcon, LogOut } from 'lucide-react'; // Import icons needed for menuList
 
-function MobileSideNav() {
-    const { user } = useKindeBrowserClient();
+function MobileSideNav({ user }) {
     const path = usePathname();
     const [open, setOpen] = useState(false); // State to manage popover open/close
 
@@ -39,8 +39,8 @@ function MobileSideNav() {
                     )}
                 </div>
             </PopoverTrigger>
-            <PopoverContent className="w-screen-md p-0 m-0 border-none bg-background shadow-none">
-                <div className="h-screen p-5 w-60 relative">
+            <PopoverContent className="w-screen-md p-0 m-0 border-none bg-background shadow-none h-[500px]">
+                <div className=" p-5 w-60 relative">
                     <Image
                         src={"/logo1.svg"}
                         alt="Logo"
@@ -68,8 +68,17 @@ function MobileSideNav() {
                             </h2>
                         </Link>
                     ))}
-
-                    <div className="absolute bottom-10 left-0 w-full p-5 flex items-center gap-3">
+                    {user && (
+                    <LogoutLink
+                        onClick={() => setOpen(false)}
+                        className="w-full justify-start flex items-center gap-3 text-foreground text-md p-4 cursor-pointer hover:bg-destructive hover:text-destructive-foreground rounded-md my-2"
+                    >
+                        <LogOut className="h-5 w-5" />
+                        Logout
+                    </LogoutLink>
+                    )}
+                 </div>
+                    <div className="absolute bottom-2 left-0 w-full p-5 flex items-center gap-3">
                         {user?.picture ? (
                             <Image
                                 src={user?.picture || "/default-avatar.png"}
@@ -86,7 +95,7 @@ function MobileSideNav() {
                             <h2 className="text-xs text-muted-foreground">{user?.email}</h2>
                         </div>
                     </div>
-                </div>
+               
             </PopoverContent>
         </Popover>
     );

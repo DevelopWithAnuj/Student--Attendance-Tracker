@@ -54,6 +54,12 @@ const CustomButtons = ({ rowData, courses, branches, years, onDeleteSuccess }) =
       })
       .catch((error) => {
         console.error("Error updating student:", error);
+        if (error?.response?.status) {
+          toast(error?.response?.data?.error || `Error: ${error.response.status}`, {
+            type: "error",
+          });
+          return;
+        }
         toast("An error occurred while updating the student.", {
           type: "error",
         });

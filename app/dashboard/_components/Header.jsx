@@ -3,6 +3,7 @@ import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Image from "next/image";
 import React, { useState, useEffect } from "react"; // Added useState, useEffect
 import MobileSideNav from "./MobileSideNav"; // Imported MobileSideNav
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 
 const Header = () => {
   const { user, logout } = useKindeBrowserClient();
@@ -32,7 +33,7 @@ const Header = () => {
       </div>
       <div className="flex items-center gap-4">
         {isClient && isMobile ? ( // Render MobileSideNav on mobile
-          <MobileSideNav />
+          <MobileSideNav user={user} />
         ) : ( // Render existing user info on desktop
           <>
             {user && (
@@ -43,12 +44,11 @@ const Header = () => {
                   </p>
                   <p className="text-xs text-foreground">{user.email}</p>
                 </div>
-                <button
-                  onClick={logout}
+                <LogoutLink
                   className="px-4 py-2 bg-red-500 hover:bg-red-600 text-destructive-foreground rounded-lg transition-colors duration-200"
                 >
                   Logout
-                </button>
+                </LogoutLink>
               </>
             )}
             {user?.picture ? (

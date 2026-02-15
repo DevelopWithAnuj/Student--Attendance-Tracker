@@ -95,3 +95,59 @@ export async function DELETE(req){
 
   return NextResponse.json({ result });
 }
+
+export async function PUT(req) {
+  try {
+    const searchParams = req.nextUrl.searchParams;
+    const id = searchParams.get('id');
+    const data = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Student ID is required' }, { status: 400 });
+    }
+
+    if (!data?.email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    // Check for duplicate email for other students (case-insensitive)
+    const [existing] = await db
+      .select()
+      .from(students)
+      .where(and(
+        eq(sql`lower(${students.email})`, data.email.toLowerCase()),
+        // Exclude the current student from the duplicate check
+        id ? sql`NOT ${eq(students.id, Number(id))}` : sql`TRUE`
+      ));
+    
+    // If an existing student with the same email (but different ID) is found
+    if (existing) {
+      return NextResponse.json({ error: 'Email already exists for another student' }, { status: 409 });
+    }
+
+    const [updatedStudent] = await db
+      .update(students)
+      .set({
+        name: data?.name ?? null,
+        email: data.email.toLowerCase(),
+        phone: data?.phone ?? null,
+        courseId: data?.courseId ? Number(data.courseId) : null,
+        branchId: data?.branchId ? Number(data.branchId) : null,
+        yearId: data?.yearId ? Number(data.yearId) : null,
+        address: data?.address ?? null,
+        // Assuming you have an updatedAt field and it's handled by Drizzle or you want to manually set it
+        // updatedAt: new Date(),
+      })
+      .where(eq(students.id, Number(id)))
+      .returning();
+
+    if (!updatedStudent) {
+      return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedStudent, { status: 200 });
+  } catch (err) {
+    console.error('Error updating student:', err);
+    return NextResponse.json({ error: 'Server error during update' }, { status: 500 });
+  }
+}
