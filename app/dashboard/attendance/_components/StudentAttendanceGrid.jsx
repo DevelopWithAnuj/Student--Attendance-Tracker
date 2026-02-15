@@ -7,7 +7,6 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { getUniqueRecord } from "@/app/_services/service";
 
 function StudentAttendanceGrid({
   attendanceList,
@@ -38,27 +37,36 @@ function StudentAttendanceGrid({
   const pageSize = 10; // Students per page
 
   useEffect(() => {
+    console.log("attendanceList updated, processing:", attendanceList); // Debug log
     const newStudentAttendance = {};
-    if (attendanceList) {
-      const uniqueAttendanceRecords = getUniqueRecord(attendanceList); // Use the function
 
-      uniqueAttendanceRecords.forEach((record) => {
+    // Initialize with all students
+    if (allStudents) {
+      allStudents.forEach(student => {
+        newStudentAttendance[student.id] = {
+          student: student,
+          attendance: {},
+        };
+      });
+    }
+
+    if (attendanceList) {
+      console.log("attendanceList:", attendanceList); // Debug log
+
+      attendanceList.forEach((record) => {
         if (record.students) {
           const studentId = record.students.id;
-          if (!newStudentAttendance[studentId]) {
-            newStudentAttendance[studentId] = {
-              student: record.students,
-              attendance: {},
-            };
+          if (newStudentAttendance[studentId]) { // Check if student exists in the new list
+            const day = getDayOfMonth(record.attendance.date);
+            newStudentAttendance[studentId].attendance[day] =
+              record.attendance.present;
           }
-          const day = getDayOfMonth(record.attendance.date);
-          newStudentAttendance[studentId].attendance[day] =
-            record.attendance.present;
         }
       });
     }
     setStudentAttendance(newStudentAttendance);
-  }, [attendanceList, selectedMonth]);
+    console.log("newStudentAttendance (after set):", newStudentAttendance); // Debug log
+  }, [attendanceList, selectedMonth, allStudents]);
 
   const onAttendanceChange = (studentId, day, isPresent) => {
     setAttendance((prev) => {
@@ -156,7 +164,7 @@ function StudentAttendanceGrid({
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `attendance_${selectedMonth.format("YYYY_MM")}.csv`);
+    link.setAttribute("download", `attendance_${moment(selectedMonth).format("YYYY_MM")}.csv`);
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
@@ -175,11 +183,20 @@ function StudentAttendanceGrid({
 
   const totalPages = Math.ceil(filteredStudents.length / pageSize);
 
+  if (!allStudents || allStudents.length === 0) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        <p>No students data available. Please search with filters first.</p>
+      </div>
+    );
+  }
   return (
     <div>
       {/* Filter Input */}
       <div className="p-4 border-t border-x rounded-t-lg shadow-sm">
         <Input
+          id="student-filter"
+          name="student-filter"
           type="text"
           placeholder="Filter students by name..."
           value={filterText}
@@ -251,6 +268,7 @@ function StudentAttendanceGrid({
                       (day) => {
                         const recordedAttendance =
                           studentAttendance[student.id]?.attendance[day];
+                        console.log(`Student ${student.id}, Day ${day}: recordedAttendance = ${recordedAttendance}`); // Debug log
                         const pendingAttendance =
                           attendance[student.id]?.[day];
                         const displayAttendance =

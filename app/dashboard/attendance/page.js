@@ -110,31 +110,35 @@ function Attendance() {
 
       <div className="flex flex-wrap gap-4 my-4 p-4 border rounded-lg shadow-sm">
         <div className="flex gap-2 items-center ">
-          <label className="text-foreground">Select Month:</label>
+          <label htmlFor="month-select" className="text-foreground">Select Month:</label>
           <MonthSelection
+            id="month-select"
             selectedMonth={selectedMonth}
             onMonthChange={(value) => setSelectedMonth(value)} // Pass callback
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label className="text-foreground">Select Course:</label>
+          <label htmlFor="course-select" className="text-foreground">Select Course:</label>
           <CourseSelection
+            id="course-select"
             courseList={courseList}
             selectedCourse={selectedCourse}
             onCourseChange={handleCourseChange}
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label className="text-foreground">Select Branch:</label>
+          <label htmlFor="branch-select" className="text-foreground">Select Branch:</label>
           <BranchSelection
+            id="branch-select"
             branchList={branchList}
             selectedBranch={selectedBranch}
             onBranchChange={(value) => setSelectedBranch(value)}
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label className="text-foreground">Select Year:</label>
+          <label htmlFor="year-select" className="text-foreground">Select Year:</label>
           <YearSelection
+            id="year-select"
             yearList={yearList}
             selectedYear={selectedYear}
             onYearChange={(value) => setSelectedYear(value)}

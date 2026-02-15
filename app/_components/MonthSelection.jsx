@@ -11,12 +11,13 @@ import { addMonths } from "date-fns";
 import moment from "moment/moment";
 import { Calendar } from "@/components/ui/calendar";
 
-function MonthSelection({ selectedMonth, onMonthChange }) {
+function MonthSelection({ selectedMonth, onMonthChange, id }) {
   return (
     <div className="">
       <Popover>
         <PopoverTrigger asChild>
           <Button
+            id={id}
             variant="outline"
             className="flex gap-2 items-center text-slate-500 dark:text-gray-300"
           >

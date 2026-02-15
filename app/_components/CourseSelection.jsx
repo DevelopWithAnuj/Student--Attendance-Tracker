@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import GlobalApi from "../_services/GlobalApi";
 import { toast } from "sonner";
 
-function CourseSelection({ selectedCourse, onCourseChange, courseList }) {
+function CourseSelection({ selectedCourse, onCourseChange, courseList, id }) {
   return (
     <div className="">
       <select
-        id="course"
+        id={id}
         className="col-span-3 border border-input p-2 rounded-lg bg-background text-foreground"
         value={selectedCourse}
         onChange={(e) => onCourseChange(e.target.value)}

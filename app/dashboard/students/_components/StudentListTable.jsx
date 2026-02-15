@@ -1,22 +1,26 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
-import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react"; // Add forwardRef, useImperativeHandle
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Input } from "@/components/ui/input";
+// Removed Button import
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { Search } from "lucide-react";
 import GlobalApi from "@/app/_services/GlobalApi";
 import CustomButtons from "./CustomButtons";
+import moment from "moment";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const StudentListTable = ({ studentList, refreshData }) => {
+// Wrap the component with forwardRef
+const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
   const [rowData, setRowData] = useState([]);
   const [courseList, setCourseList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [yearList, setYearList] = useState([]);
   const gridRef = useRef(null);
   const gridApiRef = useRef(null);
+  // Removed exportButtonRef
   const [columnDef, setColumnDef] = useState([]);
 
 
@@ -110,8 +114,21 @@ const StudentListTable = ({ studentList, refreshData }) => {
 
   const [searchInput, setSearchInput] = useState("");
 
+  // Expose the CSV export function via useImperativeHandle
+  useImperativeHandle(ref, () => ({
+    triggerCsvExport: () => {
+      if (gridApiRef.current) {
+        const filename = `students_data_${moment().format("YYYY_MM_DD")}.csv`;
+        gridApiRef.current.exportDataAsCsv({ fileName: filename });
+      }
+    }
+  }));
+
+  // Removed onFirstDataRendered and related useEffect
+
   return (
     <div>
+      {/* Removed hidden button div */}
       <div className="ag-theme-alpine" style={{ height: 486, width: "100%", marginTop: "20px" }}>
       <div className="flex gap-2 items-center mb-4 w-full sm:max-w-sm">
         <Search className="h-4 w-4 text-gray-400" />
@@ -130,6 +147,7 @@ const StudentListTable = ({ studentList, refreshData }) => {
           className="p-2"
         />
       </div>
+        {/* Removed Export to CSV button */}
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
@@ -138,11 +156,12 @@ const StudentListTable = ({ studentList, refreshData }) => {
           pagination={true}
           paginationPageSize={10}
           paginationAutoPageSize={true}
-          onGridReady={onGridReady} 
+          onGridReady={onGridReady}
+          // Removed onFirstDataRendered prop
         />
       </div>
     </div>
   );
-};
+}); // End of forwardRef wrapper
 
 export default StudentListTable;

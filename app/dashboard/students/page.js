@@ -1,17 +1,18 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react'; // Add useRef
 import AddNewStudent from './_components/AddNewStudent';
 import GlobalApi from '@/app/_services/GlobalApi';
 import StudentListTable from './_components/StudentListTable';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
-const Student= () => {
+const Student = () => {
   const [studentList, setStudentList] = useState([]);
   const [courseList, setCourseList] = useState([]);
   const [branchList, setBranchList] = useState([]);
   const [yearList, setYearList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const studentTableRef = useRef(null); // Create ref for StudentListTable
 
   useEffect(() => {
     getPageData();
@@ -63,6 +64,12 @@ const Student= () => {
       });
   };
 
+  const handleExportCSV = () => {
+    if (studentTableRef.current) {
+      studentTableRef.current.triggerCsvExport();
+    }
+  };
+
   return (
     <div className='p-4 sm:p-7'>
       <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
@@ -71,6 +78,7 @@ const Student= () => {
         </h2>
         <div className='flex items-center gap-2'>
           <Button onClick={handleSync}>Sync DB</Button>
+          <Button onClick={handleExportCSV} variant="outline">Export to CSV</Button> {/* Add Export to CSV button */}
           <AddNewStudent
             courseList={courseList}
             branchList={branchList}
@@ -84,6 +92,7 @@ const Student= () => {
         <div className="text-center p-10">Loading...</div>
       ) : (
         <StudentListTable
+          ref={studentTableRef} // Pass the ref to StudentListTable
           studentList={studentList}
           refreshData={refreshStudentList}
         />

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import GlobalApi from "../_services/GlobalApi";
 
-function YearSelection({ selectedYear, onYearChange, yearList }) {
+function YearSelection({ selectedYear, onYearChange, yearList, id }) {
   return (
     <div className="">
       <select
-        id="year"
+        id={id}
         className="col-span-3 border border-input p-2 rounded-lg bg-background text-foreground"
         value={selectedYear}
         onChange={(e) => onYearChange(e.target.value)}
