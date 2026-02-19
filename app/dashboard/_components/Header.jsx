@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react"; // Added useState, useEffect
 import MobileSideNav from "./MobileSideNav"; // Imported MobileSideNav
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import NotificationBell from "./NotificationBell";
 
 const Header = () => {
   const { user, logout } = useKindeBrowserClient();
@@ -32,6 +33,8 @@ const Header = () => {
         Student Attendance Tracker
       </div>
       <div className="flex items-center gap-4">
+        
+        <NotificationBell />
         {isClient && isMobile ? ( // Render MobileSideNav on mobile
           <MobileSideNav user={user} />
         ) : ( // Render existing user info on desktop

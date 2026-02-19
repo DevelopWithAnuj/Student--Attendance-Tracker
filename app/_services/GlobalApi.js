@@ -38,6 +38,17 @@ const GetDashboardSummary = (course, branch, year, month) => {
   });
 };
 
+const GetAttendanceTrend = (course, branch, year, month) => {
+  return axios.get("/api/attendance/trend", {
+    params: {
+      course: course,
+      branch: branch,
+      year: year,
+      month: month,
+    },
+  });
+};
+
 const SyncDbSequence = () => axios.post("/api/debug/sync-sequence");
 
 export default {
@@ -53,4 +64,5 @@ export default {
   takeBulkAttendance,
   SyncDbSequence,
   GetDashboardSummary,
+  GetAttendanceTrend,
 };

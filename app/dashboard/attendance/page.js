@@ -5,9 +5,11 @@ import MonthSelection from "@/app/_components/MonthSelection";
 import YearSelection from "@/app/_components/YearSelection";
 import GlobalApi from "@/app/_services/GlobalApi";
 import { Button } from "@/components/ui/button";
+
 import moment from "moment";
 import React, { useState, useEffect } from "react";
 import StudentAttendanceGrid from "./_components/StudentAttendanceGrid";
+import { LucideHand, SearchIcon, SquareArrowDownIcon } from "lucide-react";
 
 function Attendance() {
   const [loading, setLoading] = useState(false);
@@ -19,18 +21,18 @@ function Attendance() {
 
     try {
       const attendanceResponse = await GlobalApi.GetAttendanceList(
-        selectedCourse, 
-        selectedBranch,
-        selectedYear,
-        month
+        selectedCourse === "All" ? null : selectedCourse,
+        selectedBranch === "All" ? null : selectedBranch,
+        selectedYear === "All" ? null : selectedYear,
+        month,
       );
       console.log(attendanceResponse.data);
       setAttendanceList(attendanceResponse.data.result);
 
       const studentsResponse = await GlobalApi.GetAllStudents(
-        selectedBranch,
-        selectedCourse,
-        selectedYear
+        selectedBranch === "All" ? null : selectedBranch,
+        selectedCourse === "All" ? null : selectedCourse,
+        selectedYear === "All" ? null : selectedYear,
       );
       setAllStudents(studentsResponse.data.result);
     } catch (error) {
@@ -40,9 +42,74 @@ function Attendance() {
       setLoading(false);
     }
   };
-  const [selectedBranch, setSelectedBranch] = useState();
-  const [selectedCourse, setSelectedCourse] = useState();
-  const [selectedYear, setSelectedYear] = useState();
+  const onExportCsv = () => {
+    const month = moment(selectedMonth).format("MM/YYYY");
+    const url = `/api/attendance/export/csv?branch=${
+      selectedBranch === "All" ? "" : selectedBranch
+    }&course=${selectedCourse === "All" ? "" : selectedCourse}&year=${
+      selectedYear === "All" ? "" : selectedYear
+    }&month=${month}`;
+    window.open(url, "_blank");
+  };
+
+  const onExportPdf = async () => {
+    const { default: jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
+    const doc = new jsPDF();
+    const month = moment(selectedMonth).format("MMMM YYYY");
+    doc.text(`Attendance for ${month}`, 14, 10);
+    doc.text(`Branch: ${selectedBranch}`, 14, 16);
+    doc.text(`Course: ${selectedCourse}`, 14, 22);
+    doc.text(`Year: ${selectedYear}`, 14, 28);
+
+    const daysInMonth = moment(selectedMonth).daysInMonth();
+    const head = [["Student Name"]];
+    for (let i = 1; i <= daysInMonth; i++) {
+      head[0].push(i.toString());
+    }
+
+    const body = allStudents.map((student) => {
+      const row = [student.name];
+      for (let i = 1; i <= daysInMonth; i++) {
+        const date = moment(selectedMonth).date(i).format("YYYY-MM-DD");
+        const attendanceRecord = attendanceList.find(
+          (att) =>
+            att.students.id === student.id && att.attendance.date === date,
+        );
+        row.push(
+          attendanceRecord
+            ? attendanceRecord.attendance.present
+              ? "P"
+              : "A"
+            : "-",
+        );
+      }
+      return row;
+    });
+
+    autoTable(doc, {
+      head: head,
+      body: body,
+      startY: 35,
+      theme: "grid",
+      styles: {
+        fontSize: 8,
+        cellPadding: 1,
+        overflow: "linebreak",
+      },
+      headStyles: {
+        fillColor: [22, 160, 133],
+        textColor: 255,
+        fontStyle: "bold",
+      },
+    });
+
+    doc.save("attendance.pdf");
+  };
+
+  const [selectedBranch, setSelectedBranch] = useState("All");
+  const [selectedCourse, setSelectedCourse] = useState("All");
+  const [selectedYear, setSelectedYear] = useState("All");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [attendanceList, setAttendanceList] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
@@ -63,32 +130,26 @@ function Attendance() {
     try {
       const coursesResp = await GlobalApi.GetAllCourses();
       const coursesData = coursesResp.data?.result;
-      if (Array.isArray(coursesData) && coursesData.length > 0) {
-        setCourseList(coursesData);
-        setSelectedCourse(coursesData[0].name);
+      if (Array.isArray(coursesData)) {
+        setCourseList([{ name: "All", id: "all" }, ...coursesData]);
       } else {
-        setCourseList([]);
-        setSelectedCourse(""); // Set to empty string
+        setCourseList([{ name: "All", id: "all" }]);
       }
 
       const branchesResp = await GlobalApi.GetAllBranches();
       const branchesData = branchesResp.data?.result;
-      if (Array.isArray(branchesData) && branchesData.length > 0) {
-        setBranchList(branchesData);
-        setSelectedBranch(branchesData[0].name);
+      if (Array.isArray(branchesData)) {
+        setBranchList([{ name: "All", id: "all" }, ...branchesData]);
       } else {
-        setBranchList([]);
-        setSelectedBranch(""); // Set to empty string
+        setBranchList([{ name: "All", id: "all" }]);
       }
 
       const yearsResp = await GlobalApi.GetAllYears();
       const yearsData = yearsResp.data?.result;
-      if (Array.isArray(yearsData) && yearsData.length > 0) {
-        setYearList(yearsData);
-        setSelectedYear(yearsData[0].value);
+      if (Array.isArray(yearsData)) {
+        setYearList([{ value: "All", id: "all" }, ...yearsData]);
       } else {
-        setYearList([]);
-        setSelectedYear(""); // Set to empty string
+        setYearList([{ value: "All", id: "all" }]);
       }
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
@@ -105,12 +166,17 @@ function Attendance() {
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
-      <h2 className="text-2xl font-bold">Attendance</h2>
+      <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
+        <LucideHand className="h-8 w-8 text-muted-foreground" />
+        Attendance
+      </h2>
       {/* {Search Option} */}
 
       <div className="flex flex-wrap gap-4 my-4 p-4 border rounded-lg shadow-sm">
         <div className="flex gap-2 items-center ">
-          <label htmlFor="month-select" className="text-foreground">Select Month:</label>
+          <label htmlFor="month-select" className="text-foreground">
+            Select Month:
+          </label>
           <MonthSelection
             id="month-select"
             selectedMonth={selectedMonth}
@@ -118,7 +184,9 @@ function Attendance() {
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label htmlFor="course-select" className="text-foreground">Select Course:</label>
+          <label htmlFor="course-select" className="text-foreground">
+            Select Course:
+          </label>
           <CourseSelection
             id="course-select"
             courseList={courseList}
@@ -127,7 +195,9 @@ function Attendance() {
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label htmlFor="branch-select" className="text-foreground">Select Branch:</label>
+          <label htmlFor="branch-select" className="text-foreground">
+            Select Branch:
+          </label>
           <BranchSelection
             id="branch-select"
             branchList={branchList}
@@ -136,7 +206,9 @@ function Attendance() {
           />
         </div>
         <div className="flex gap-2 items-center bg-background">
-          <label htmlFor="year-select" className="text-foreground">Select Year:</label>
+          <label htmlFor="year-select" className="text-foreground">
+            Select Year:
+          </label>
           <YearSelection
             id="year-select"
             yearList={yearList}
@@ -144,11 +216,24 @@ function Attendance() {
             onYearChange={(value) => setSelectedYear(value)}
           />
         </div>
-        <Button className="self-end" onClick={() => onSearchHandler()}>Search</Button>
+        <Button className="self-end" onClick={() => onSearchHandler()}>
+        <SearchIcon className="h-4 w-4 mr-1" />
+          Search
+        </Button>
+        <Button className="self-end" onClick={() => onExportCsv()}>
+          <SquareArrowDownIcon className="h-4 w-4 mr-1" />
+          Export to CSV
+        </Button>
+        <Button className="self-end" onClick={() => onExportPdf()}>
+          <SquareArrowDownIcon className="h-4 w-4 mr-1" />
+          Export to PDF
+        </Button>
       </div>
 
       {loading ? (
-        <div className="text-center p-5 text-lg">Loading Attendance Data...</div>
+        <div className="text-center p-5 text-lg">
+          Loading Attendance Data...
+        </div>
       ) : (
         <StudentAttendanceGrid
           attendanceList={attendanceList}

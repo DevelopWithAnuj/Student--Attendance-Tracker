@@ -7,6 +7,7 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { Edit3Icon } from "lucide-react";
 
 function StudentAttendanceGrid({
   attendanceList,
@@ -372,16 +373,16 @@ function StudentAttendanceGrid({
       {/* Action Buttons */}
       <div className="mt-4 flex flex-wrap gap-2">
         {!isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit Attendance</Button>
+          <Button onClick={() => setIsEditing(true)}>
+            <Edit3Icon className="h-4 w-4 mr-1" />
+            Edit Attendance</Button>
         )}
         {isEditing && (
           <Button onClick={onSave} disabled={loading}>
             {loading ? "Saving..." : "Save Attendance"}
           </Button>
         )}
-        <Button onClick={exportToCSV} variant="outline">
-          Export to CSV
-        </Button>
+
       </div>
     </div>
   );

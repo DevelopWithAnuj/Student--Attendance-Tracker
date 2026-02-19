@@ -5,6 +5,8 @@ import GlobalApi from '@/app/_services/GlobalApi';
 import StudentListTable from './_components/StudentListTable';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { LayoutListIcon, MenuSquare } from 'lucide-react';
 
 const Student = () => {
   const [studentList, setStudentList] = useState([]);
@@ -70,21 +72,58 @@ const Student = () => {
     }
   };
 
+  const handleExportPDF = () => {
+    if (studentTableRef.current) {
+      studentTableRef.current.triggerPdfExport();
+    }
+  };
+
   return (
-    <div className='p-4 sm:p-7'>
-      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
-        <h2 className='font-bold text-2xl'>
+    <div className="p-4 sm:p-7">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
+          <LayoutListIcon className="h-8 w-8 text-muted-foreground" />
           Students
         </h2>
-        <div className='flex items-center gap-2'>
-          <Button onClick={handleSync}>Sync DB</Button>
-          <Button onClick={handleExportCSV} variant="outline">Export to CSV</Button> {/* Add Export to CSV button */}
-          <AddNewStudent
-            courseList={courseList}
-            branchList={branchList}
-            yearList={yearList}
-            refreshData={refreshStudentList}
-          />
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8">
+                <MenuSquare className="h-4 w-4" /> Menu
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2">
+              <div className="grid gap-2">
+                <Button
+                  onClick={handleSync}
+                  variant="ghost"
+                  className="justify-start"
+                >
+                  Sync DB
+                </Button>
+                <Button
+                  onClick={handleExportCSV}
+                  variant="ghost"
+                  className="justify-start"
+                >
+                  Export to CSV
+                </Button>
+                <Button
+                  onClick={handleExportPDF}
+                  variant="ghost"
+                  className="justify-start"
+                >
+                  Export to PDF
+                </Button>
+                <AddNewStudent
+                  courseList={courseList}
+                  branchList={branchList}
+                  yearList={yearList}
+                  refreshData={refreshStudentList}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -100,5 +139,7 @@ const Student = () => {
     </div>
   );
 };
+
+
 
 export default Student;

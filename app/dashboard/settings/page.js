@@ -14,8 +14,10 @@ const Settings = () => {
   return (
     <div className="p-4 sm:p-6 md:p-10">
       <div className="flex items-center gap-3 mb-8">
-        <SettingsIcon className="h-8 w-8 text-foreground" />
-        <h2 className="text-3xl font-bold text-foreground">Settings</h2>
+        <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
+        <SettingsIcon className="h-8 w-8 text-muted-foreground" />
+          Settings
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -25,7 +27,9 @@ const Settings = () => {
             <Sun className="h-5 w-5" />
             Theme Settings
           </h3>
-          <p className="text-muted-foreground mb-4">Choose your preferred theme for the application.</p>
+          <p className="text-muted-foreground mb-4">
+            Choose your preferred theme for the application.
+          </p>
           <div className="flex gap-3">
             <Button
               variant={theme === "light" ? "default" : "outline"}
@@ -73,7 +77,9 @@ const Settings = () => {
               ) : (
                 <div className="w-15 h-15 bg-muted rounded-full flex items-center justify-center">
                   <span className="text-muted-foreground font-semibold text-lg">
-                    {user.given_name?.[0] || user.email?.[0]?.toUpperCase() || "U"}
+                    {user.given_name?.[0] ||
+                      user.email?.[0]?.toUpperCase() ||
+                      "U"}
                   </span>
                 </div>
               )}
@@ -89,7 +95,9 @@ const Settings = () => {
 
         {/* App Information */}
         <Card className="p-6 md:col-span-2">
-          <h3 className="text-xl font-semibold mb-4">Application Information</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Application Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div>
               <h4 className="font-semibold text-lg">Version</h4>
@@ -101,7 +109,9 @@ const Settings = () => {
             </div>
             <div>
               <h4 className="font-semibold text-lg">Developer</h4>
-              <p className="text-muted-foreground">Student Attendance Tracker Team</p>
+              <p className="text-muted-foreground">
+                Student Attendance Tracker Team
+              </p>
             </div>
           </div>
         </Card>

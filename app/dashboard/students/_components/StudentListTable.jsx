@@ -10,6 +10,7 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import CustomButtons from "./CustomButtons";
 import moment from "moment";
 
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 // Wrap the component with forwardRef
@@ -121,6 +122,36 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
         const filename = `students_data_${moment().format("YYYY_MM_DD")}.csv`;
         gridApiRef.current.exportDataAsCsv({ fileName: filename });
       }
+    },
+    triggerPdfExport: async () => {
+      const { default: jsPDF } = await import('jspdf');
+      const { default: autoTable } = await import('jspdf-autotable');
+      const doc = new jsPDF();
+      doc.text("Student List", 14, 10);
+
+      const tableColumn = columnDef.map(col => col.headerName).filter(name => name !== "Actions");
+      const tableRows = rowData.map(row => 
+        columnDef.filter(col => col.field !== "actions").map(col => row[col.field])
+      );
+
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+        theme: "grid",
+        styles: {
+          fontSize: 8,
+          cellPadding: 1,
+          overflow: "linebreak",
+        },
+        headStyles: {
+          fillColor: [22, 160, 133],
+          textColor: 255,
+          fontStyle: "bold",
+        },
+      });
+
+      doc.save(`students_data_${moment().format("YYYY_MM_DD")}.pdf`);
     }
   }));
 
@@ -128,8 +159,6 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
 
   return (
     <div>
-      {/* Removed hidden button div */}
-      <div className="ag-theme-alpine" style={{ height: 486, width: "100%", marginTop: "20px" }}>
       <div className="flex gap-2 items-center mb-4 w-full sm:max-w-sm">
         <Search className="h-4 w-4 text-gray-400" />
         <Input
@@ -138,7 +167,6 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
           onChange={(e) => {
             const v = e.target.value;
             setSearchInput(v);
-              // use the stored GridApi and guard the call
               if (gridApiRef.current && typeof gridApiRef.current.setQuickFilter === "function") {
               gridApiRef.current.setQuickFilter(v);
             }
@@ -147,7 +175,7 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
           className="p-2"
         />
       </div>
-        {/* Removed Export to CSV button */}
+      <div className="ag-theme-alpine" style={{ height: "calc(100vh - 250px)", width: "100%" }}>
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
@@ -157,11 +185,9 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
           paginationPageSize={10}
           paginationAutoPageSize={true}
           onGridReady={onGridReady}
-          // Removed onFirstDataRendered prop
         />
       </div>
     </div>
-  );
-}); // End of forwardRef wrapper
+  );}); // End of forwardRef wrapper
 
 export default StudentListTable;
