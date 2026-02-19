@@ -29,9 +29,18 @@ const Dashboard = () => {
   const [attendanceList, setAttendanceList] = useState([]);
   const [allStudents, setAllStudents] = useState([]);
   const [trendData, setTrendData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [dashboardSummary, setDashboardSummary] = useState({});
   const { addNotification } = useNotifications();
+
+  // Loading states for each data fetch
+  const [dropdownLoading, setDropdownLoading] = useState(true);
+  const [studentsLoading, setStudentsLoading] = useState(true);
+  const [attendanceLoading, setAttendanceLoading] = useState(true);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [trendLoading, setTrendLoading] = useState(true);
+
+  // Overall loading state
+  const overallLoading = dropdownLoading || studentsLoading || attendanceLoading || summaryLoading || trendLoading;
 
   useEffect(() => {
     fetchAllDropdownData(); // Fetch initial dropdown data
@@ -39,7 +48,7 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (allStudents.length > 0 && attendanceList.length > 0) {
+    if (!overallLoading && allStudents.length > 0 && attendanceList.length > 0) {
       const attendanceThreshold = 75; // 75%
       const studentAttendance = {};
 
@@ -70,18 +79,23 @@ const Dashboard = () => {
         }
       });
     }
-  }, [allStudents, attendanceList]);
+  }, [allStudents, attendanceList, overallLoading]);
 
   const fetchAllStudents = async () => {
+    setStudentsLoading(true);
     try {
       const studentsResponse = await GlobalApi.GetAllStudents(null, null, null);
       setAllStudents(studentsResponse.data.result);
     } catch (error) {
       console.error("Error fetching students:", error);
+      toast.error("Failed to fetch student list.");
+    } finally {
+      setStudentsLoading(false);
     }
   };
+
   const fetchAllDropdownData = async () => {
-    setLoading(true); // Set loading true during data fetch
+    setDropdownLoading(true);
     try {
       const coursesResp = await GlobalApi.GetAllCourses();
       const coursesData = coursesResp.data?.result;
@@ -111,13 +125,14 @@ const Dashboard = () => {
         "Error fetching dropdown data for Dashboard:",
         error.response?.data?.details || error.message,
       );
+      toast.error("Failed to fetch dropdown data.");
     } finally {
-      setLoading(false); // Set loading false after fetch
+      setDropdownLoading(false);
     }
   };
 
   const getStudentAttendance = () => {
-    setLoading(true); // Set loading true before attendance fetch
+    setAttendanceLoading(true);
     GlobalApi.GetAttendanceList(
       selectedCourse === "All" ? null : selectedCourse,
       selectedBranch === "All" ? null : selectedBranch,
@@ -125,19 +140,20 @@ const Dashboard = () => {
       moment(selectedMonth).format("MM/YYYY"),
     )
       .then((resp) => {
-        console.log(resp);
         setAttendanceList(resp.data.result);
       })
       .catch((error) => {
         console.error("Error fetching attendance data for Dashboard:", error);
+        toast.error("Failed to fetch attendance data.");
         setAttendanceList([]); // Clear attendance on error
       })
       .finally(() => {
-        setLoading(false); // Set loading false after fetch
+        setAttendanceLoading(false);
       });
   };
 
   const GetDashboardSummary = () => {
+    setSummaryLoading(true);
     GlobalApi.GetDashboardSummary(
       selectedCourse === "All" ? null : selectedCourse,
       selectedBranch === "All" ? null : selectedBranch,
@@ -145,19 +161,20 @@ const Dashboard = () => {
       moment(selectedMonth).format("MM/YYYY"),
     )
       .then((resp) => {
-        console.log(resp);
         setDashboardSummary(resp.data.result);
       })
       .catch((error) => {
         console.error("Error fetching dashboard summary data:", error);
+        toast.error("Failed to fetch dashboard summary.");
         setDashboardSummary({});
       })
       .finally(() => {
-        setLoading(false);
+        setSummaryLoading(false);
       });
   };
 
   const getAttendanceTrend = () => {
+    setTrendLoading(true);
     GlobalApi.GetAttendanceTrend(
       selectedCourse === "All" ? null : selectedCourse,
       selectedBranch === "All" ? null : selectedBranch,
@@ -165,17 +182,22 @@ const Dashboard = () => {
       moment(selectedMonth).format("MM/YYYY"),
     )
       .then((resp) => {
-        console.log(resp);
         setTrendData(resp.data.result);
       })
       .catch((error) => {
         console.error("Error fetching trend data:", error);
+        toast.error("Failed to fetch attendance trend.");
         setTrendData([]);
+      })
+      .finally(() => {
+        setTrendLoading(false);
       });
   };
 
   useEffect(() => {
     if (
+      !dropdownLoading &&
+      !studentsLoading &&
       selectedBranch !== "" &&
       selectedCourse !== "" &&
       selectedYear !== "" &&
@@ -185,7 +207,7 @@ const Dashboard = () => {
       GetDashboardSummary();
       getAttendanceTrend();
     }
-  }, [selectedMonth, selectedBranch, selectedCourse, selectedYear]);
+  }, [selectedMonth, selectedBranch, selectedCourse, selectedYear, dropdownLoading, studentsLoading]);
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
@@ -237,26 +259,26 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {loading ? (
+      {overallLoading ? (
         <div className="text-center p-5 text-lg text-muted-foreground">
-          Loading Attendance Data...
+          Loading Dashboard Data...
         </div>
       ) : (
-        // Render StatusList component
-        <StatusList attendanceList={attendanceList} />
+        <>
+          <StatusList attendanceList={attendanceList} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            <div className="md:col-span-2">
+              <BarChartComponent attendance={attendanceList} />
+            </div>
+            <div className="md:col-span-1">
+              <PieChartComponent attendance={attendanceList} />
+            </div>
+          </div>
+          <div className="mt-4">
+            <TrendChartComponent data={trendData} />
+          </div>
+        </>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-        <div className="md:col-span-2">
-          <BarChartComponent attendance={attendanceList} />
-        </div>
-        <div className="md:col-span-1">
-          <PieChartComponent attendance={attendanceList} />
-        </div>
-      </div>
-      <div className="mt-4">
-        <TrendChartComponent data={trendData} />
-      </div>
     </div>
   );
 };

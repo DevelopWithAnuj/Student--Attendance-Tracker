@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import Image from "next/image";
 import Link from 'next/link';
-import { GraduationCap, Hand, LayoutIcon, SettingsIcon } from 'lucide-react';
+import { GraduationCap, Hand, LayoutIcon, SettingsIcon, LayoutListIcon } from 'lucide-react';
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 import { usePathname } from 'next/navigation';
 
@@ -30,6 +30,12 @@ export const menuList = [
         name: 'Settings',
         icon: SettingsIcon,
         path: '/dashboard/settings'
+    },
+    {
+        id: 5,
+        name: 'Management',
+        icon: LayoutListIcon,
+        path: '/dashboard/management'
     },
 ];
 

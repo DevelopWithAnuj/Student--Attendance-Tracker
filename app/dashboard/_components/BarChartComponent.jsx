@@ -49,17 +49,17 @@ function BarChartComponent({ attendance }) {
     setData(chartData);
   };
   return (
-    <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm">
+    <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Daily Attendance Chart</h3>
       <ResponsiveContainer width="100%" aspect={2}>
-        <BarChart data={data}>
+        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="day" />
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="presentCount" fill="var(--color-chart-1)" name="Present" />
-          <Bar dataKey="absentCount" fill="var(--color-chart-2)" name="Absent" />
+          <Bar dataKey="presentCount" fill="#4ade80" name="Present" />
+          <Bar dataKey="absentCount" fill="#ef4444" name="Absent" />
           {data.length === 0 && (
             <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="var(--color-muted-foreground)">
               No data available
