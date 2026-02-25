@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pie, PieChart, ResponsiveContainer, Legend } from 'recharts';
+import EmptyState from './EmptyState';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 const COLORS = ['#4ade80', '#ef4444']; // Green for Present, Red for Absent
 
@@ -52,8 +54,8 @@ function PieChartComponent({ attendance }) {
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Monthly Attendance Summary</h3>
-      <ResponsiveContainer width="100%" aspect={1}>
-        {data && data.length > 0 && (data[0].value > 0 || data[1].value > 0) ? (
+      {data && data.length > 0 && (data[0].value > 0 || data[1].value > 0) ? (
+        <ResponsiveContainer width="100%" aspect={1}>
           <PieChart>
             <Pie
               data={data}
@@ -67,12 +69,16 @@ function PieChartComponent({ attendance }) {
             />
             <Legend />
           </PieChart>
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            No data available
-          </div>
-        )}
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-[300px]">
+          <EmptyState 
+            icon={PieChartIcon}
+            title="No summary available"
+            description="No attendance data found to generate a summary for this month."
+          />
+        </div>
+      )}
     </div>
   );
 }

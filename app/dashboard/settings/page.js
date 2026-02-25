@@ -1,15 +1,40 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Moon, Sun, User, Settings as SettingsIcon } from "lucide-react";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
-  const { user } = useKindeBrowserClient();
+  const { user, isLoading: isUserLoading } = useKindeBrowserClient();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    toast.success(`Theme changed to ${newTheme}`);
+  };
+
+  if (!mounted) {
+    return (
+      <div className="p-4 sm:p-6 md:p-10">
+        <Skeleton className="h-10 w-48 mb-8" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full md:col-span-2" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
@@ -33,7 +58,7 @@ const Settings = () => {
           <div className="flex gap-3">
             <Button
               variant={theme === "light" ? "default" : "outline"}
-              onClick={() => setTheme("light")}
+              onClick={() => handleThemeChange("light")}
               className="flex items-center gap-2"
             >
               <Sun className="h-4 w-4" />
@@ -41,7 +66,7 @@ const Settings = () => {
             </Button>
             <Button
               variant={theme === "dark" ? "default" : "outline"}
-              onClick={() => setTheme("dark")}
+              onClick={() => handleThemeChange("dark")}
               className="flex items-center gap-2"
             >
               <Moon className="h-4 w-4" />
@@ -49,7 +74,7 @@ const Settings = () => {
             </Button>
             <Button
               variant={theme === "system" ? "default" : "outline"}
-              onClick={() => setTheme("system")}
+              onClick={() => handleThemeChange("system")}
               className="flex items-center gap-2"
             >
               <SettingsIcon className="h-4 w-4" />
@@ -64,7 +89,15 @@ const Settings = () => {
             <User className="h-5 w-5" />
             User Profile
           </h3>
-          {user && (
+          {isUserLoading ? (
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-15 w-15 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+          ) : user ? (
             <div className="flex items-center gap-4">
               {user.picture ? (
                 <Image
@@ -90,6 +123,8 @@ const Settings = () => {
                 <p className="text-muted-foreground">{user.email}</p>
               </div>
             </div>
+          ) : (
+            <p className="text-muted-foreground">No user data available.</p>
           )}
         </Card>
 

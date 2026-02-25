@@ -7,7 +7,8 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { Edit3Icon } from "lucide-react";
+import { Edit3Icon, UserSearch } from "lucide-react";
+import EmptyState from "../../_components/EmptyState";
 
 function StudentAttendanceGrid({
   attendanceList,
@@ -186,9 +187,11 @@ function StudentAttendanceGrid({
 
   if (!allStudents || allStudents.length === 0) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        <p>No students data available. Please search with filters first.</p>
-      </div>
+      <EmptyState 
+        icon={UserSearch}
+        title="No students data available"
+        description="Please search with filters first or add some students to this category."
+      />
     );
   }
   return (
@@ -207,20 +210,14 @@ function StudentAttendanceGrid({
       </div>
 
       {/* Table Container with Force-Hidden Scrollbars */}
-      <div className="overflow-hidden h-[500px] border-b border-x rounded-b-lg shadow-sm">
-        <div
-          className="overflow-auto h-full"
-          style={{
-            width: "calc(100% + 20px)",
-            height: "calc(100% + 20px)",
-          }}
-        >
-          <table className="min-w-full bg-background">
+      <div className="overflow-hidden h-[500px] border rounded-lg shadow-sm bg-background">
+        <div className="overflow-auto h-full w-full custom-scrollbar">
+          <table className="min-w-full border-collapse">
             {/* Table Header */}
-            <thead className="sticky top-0 z-20 bg-background border-border">
+            <thead className="sticky top-0 z-20 bg-muted/80 backdrop-blur-sm border-b">
               <tr>
                 {/* Sticky Corner Cell */}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky left-0 z-30 bg-background border-border">
+                <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider sticky left-0 z-30 bg-muted/90 border-r min-w-[120px] sm:min-w-[200px]">
                   Student
                 </th>
                 {/* Date Cells */}
@@ -235,16 +232,16 @@ function StudentAttendanceGrid({
                       today,
                       "day",
                     );
-                    let headerClass = "text-gray-500";
+                    let headerClass = "text-muted-foreground";
                     if (isPastDayHeader || isFutureDayHeader) {
-                      headerClass = "text-gray-400 dark:text-gray-500";
+                      headerClass = "text-muted-foreground/60";
                     } else if (isCurrentDayHeader) {
-                      headerClass = "font-bold text-blue-600 dark:text-blue-400";
+                      headerClass = "font-extrabold text-blue-600 dark:text-blue-400";
                     }
                     return (
                       <th
                         key={day}
-                        className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${headerClass}`}
+                        className={`px-4 py-3 text-center text-xs font-medium uppercase tracking-wider border-r ${headerClass} min-w-[45px]`}
                       >
                         {day}
                       </th>
@@ -255,13 +252,13 @@ function StudentAttendanceGrid({
             </thead>
 
             {/* Table Body */}
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {Array.isArray(paginatedStudents) &&
               paginatedStudents.length > 0 ? (
                 paginatedStudents.map((student) => (
-                  <tr key={student.id} className="group hover:bg-secondary">
+                  <tr key={student.id} className="group hover:bg-muted/50 transition-colors">
                     {/* Sticky Student Name Cell */}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground sticky left-0 z-10 bg-background group-hover:bg-primary border-r">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-foreground sticky left-0 z-10 bg-background group-hover:bg-muted/80 border-r min-w-[120px] sm:min-w-[200px] truncate shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                       {student.name}
                     </td>
                     {/* Attendance Cells */}
@@ -269,7 +266,6 @@ function StudentAttendanceGrid({
                       (day) => {
                         const recordedAttendance =
                           studentAttendance[student.id]?.attendance[day];
-                        console.log(`Student ${student.id}, Day ${day}: recordedAttendance = ${recordedAttendance}`); // Debug log
                         const pendingAttendance =
                           attendance[student.id]?.[day];
                         const displayAttendance =
@@ -294,24 +290,24 @@ function StudentAttendanceGrid({
                         } else {
                           if (displayAttendance === true) {
                             renderContent = (
-                              <span className="font-bold text-green-700 dark:text-green-400">
-                                P
-                              </span>
+                              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
+                                <span className="text-xs font-bold text-green-700 dark:text-green-400">P</span>
+                              </div>
                             );
                           } else if (displayAttendance === false) {
                             renderContent = (
-                              <span className="font-bold text-red-400 dark:text-red-300">
-                                A
-                              </span>
+                              <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
+                                <span className="text-xs font-bold text-red-700 dark:text-red-400">A</span>
+                              </div>
                             );
                           } else {
-                            renderContent = "-";
+                            renderContent = <span className="text-muted-foreground/30">-</span>;
                           }
                         }
                         return (
                           <td
                             key={day}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center border-r"
+                            className="px-2 py-3 whitespace-nowrap text-sm text-center border-r min-w-[45px]"
                           >
                             {renderContent}
                           </td>
@@ -324,7 +320,7 @@ function StudentAttendanceGrid({
                 <tr>
                   <td
                     colSpan={daysInMonth + 1}
-                    className="px-4 py-8 text-center text-gray-500"
+                    className="px-4 py-8 text-center text-muted-foreground"
                   >
                     No students found
                   </td>

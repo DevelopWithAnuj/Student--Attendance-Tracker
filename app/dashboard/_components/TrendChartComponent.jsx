@@ -10,6 +10,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import EmptyState from "./EmptyState";
+import { TrendingUp } from "lucide-react";
 
 const TrendChartComponent = ({ data }) => {
   const [isMounted, setIsMounted] = React.useState(false);
@@ -23,8 +25,8 @@ const TrendChartComponent = ({ data }) => {
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-lg font-semibold mb-4">Attendance Trend</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        {data && data.length > 0 ? (
+      {data && data.length > 0 ? (
+        <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={data}
             margin={{
@@ -46,12 +48,16 @@ const TrendChartComponent = ({ data }) => {
               activeDot={{ r: 8 }}
             />
           </LineChart>
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            No data available
-          </div>
-        )}
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-[250px]">
+          <EmptyState 
+            icon={TrendingUp}
+            title="No Trend Data"
+            description="Attendance trend data will be available once multiple days of attendance are recorded."
+          />
+        </div>
+      )}
     </div>
   );
 };

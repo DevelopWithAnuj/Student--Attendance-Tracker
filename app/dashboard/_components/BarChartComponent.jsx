@@ -1,15 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Bar,
-} from "recharts";
+import { BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, Bar } from "recharts";
 import moment from "moment";
+import EmptyState from "./EmptyState";
+import { BarChart3 } from "lucide-react";
 
 function BarChartComponent({ attendance }) {
   const [data, setData] = useState([]);
@@ -56,22 +49,27 @@ function BarChartComponent({ attendance }) {
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Daily Attendance Chart</h3>
-      <ResponsiveContainer width="100%" aspect={2}>
-        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="presentCount" fill="#4ade80" name="Present" />
-          <Bar dataKey="absentCount" fill="#ef4444" name="Absent" />
-          {data.length === 0 && (
-            <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="var(--color-muted-foreground)">
-              No data available
-            </text>
-          )}
-        </BarChart>
-      </ResponsiveContainer>
+      {data.length > 0 ? (
+        <ResponsiveContainer width="100%" aspect={2}>
+          <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="day" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="presentCount" fill="#4ade80" name="Present" />
+            <Bar dataKey="absentCount" fill="#ef4444" name="Absent" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-[300px]">
+          <EmptyState 
+            icon={BarChart3}
+            title="No Attendance Data"
+            description="No attendance records found for the selected month."
+          />
+        </div>
+      )}
     </div>
   );
 }
