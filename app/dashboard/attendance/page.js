@@ -10,14 +10,21 @@ import moment from "moment";
 import React, { useState, useEffect } from "react";
 import StudentAttendanceGrid from "./_components/StudentAttendanceGrid";
 import { LucideHand, SearchIcon, SquareArrowDownIcon } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton"; 
+import { toast } from "sonner";
 
-function Attendance() {
-  const [loading, setLoading] = useState(false);
+function Attendance() {  const [loading, setLoading] = useState(false);
   const onSearchHandler = async () => {
     console.log(selectedMonth, selectedBranch, selectedCourse, selectedYear);
     const month = moment(selectedMonth).format("MM/YYYY");
     console.log(month);
+    
+    if (selectedCourse === "All" || selectedBranch === "All" || selectedYear === "All") {
+      toast.info("Please select a specific Course, Branch, and Year to fetch attendance.");
+      // Optional: stop here if you want to force selection, 
+      // but let's allow fetching 'All' but warn if they try to edit later.
+    }
+
     setLoading(true);
 
     try {

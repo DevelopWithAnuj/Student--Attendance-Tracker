@@ -134,7 +134,10 @@ const ManagementTable = ({
             <form onSubmit={handleSubmitAdd(handleCreate)} className="py-4">
               <Input
                 placeholder={`Enter ${dataKey}`}
-                {...registerAdd(dataKey, { required: `${dataKey} is required` })}
+                {...registerAdd(dataKey, { 
+                  required: `${dataKey} is required`,
+                  minLength: { value: 2, message: `${dataKey} must be at least 2 characters` }
+                })}
               />
               {errorsAdd[dataKey] && (
                 <p className="text-red-500 text-sm mt-1">{errorsAdd[dataKey].message}</p>
@@ -203,7 +206,10 @@ const ManagementTable = ({
                       <form onSubmit={handleSubmitEdit(handleUpdate)} className="py-4">
                         <Input
                           placeholder={`Enter ${dataKey}`}
-                          {...registerEdit(dataKey, { required: `${dataKey} is required` })}
+                          {...registerEdit(dataKey, { 
+                            required: `${dataKey} is required`,
+                            minLength: { value: 2, message: `${dataKey} must be at least 2 characters` }
+                          })}
                         />
                         {errorsEdit[dataKey] && (
                             <p className="text-red-500 text-sm mt-1">{errorsEdit[dataKey].message}</p>

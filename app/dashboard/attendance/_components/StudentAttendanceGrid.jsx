@@ -373,7 +373,13 @@ function StudentAttendanceGrid({
       {/* Action Buttons */}
       <div className="mt-4 flex flex-wrap gap-2">
         {!isEditing && (
-          <Button onClick={() => setIsEditing(true)}>
+          <Button onClick={() => {
+            if (selectedCourse === "All" || selectedBranch === "All" || selectedYear === "All") {
+              toast.error("Please select a specific Course, Branch, and Year before marking attendance.");
+              return;
+            }
+            setIsEditing(true);
+          }}>
             <Edit3Icon className="h-4 w-4 mr-1" />
             Edit Attendance</Button>
         )}
