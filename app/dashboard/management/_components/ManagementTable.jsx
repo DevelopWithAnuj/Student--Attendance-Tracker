@@ -65,7 +65,7 @@ const ManagementTable = ({
       const response = await fetchData();
       setData(response.data.result || []);
     } catch (error) {
-      toast.error(`Failed to fetch ${title.toLowerCase()}.`);
+      toast.error(error.message || `Failed to fetch ${title.toLowerCase()}.`);
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ const ManagementTable = ({
       resetAdd();
       loadData();
     } catch (error) {
-      toast.error(`Failed to create ${title.toLowerCase()}.`);
+      toast.error(error.message || `Failed to create ${title.toLowerCase()}.`);
     }
   };
 
@@ -95,7 +95,7 @@ const ManagementTable = ({
       resetEdit();
       loadData();
     } catch (error) {
-      toast.error(`Failed to update ${title.toLowerCase()}.`);
+      toast.error(error.message || `Failed to update ${title.toLowerCase()}.`);
     }
   };
 
@@ -105,7 +105,7 @@ const ManagementTable = ({
       toast.success(`${title} deleted successfully.`);
       loadData();
     } catch (error) {
-      toast.error(`Failed to delete ${title.toLowerCase()}.`);
+      toast.error(error.message || `Failed to delete ${title.toLowerCase()}.`);
     }
   };
 

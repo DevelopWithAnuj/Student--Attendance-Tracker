@@ -38,13 +38,7 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
       })
       .catch((error) => {
         console.error("Error creating student:", error);
-        if (error?.response?.status == 409) {
-          toast(error?.response?.data?.error, {
-            type: "error",
-          });
-          return;
-        }
-        toast("An error occurred while adding the student.", {
+        toast(error.message || "An error occurred while adding the student.", {
           type: "error",
         });
       })

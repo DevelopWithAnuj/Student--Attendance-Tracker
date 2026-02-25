@@ -5,8 +5,44 @@ const handleApiCall = async (axiosCall) => {
     const response = await axiosCall();
     return response;
   } catch (error) {
-    console.error("API Error:", error.response?.data || error.message);
-    throw error; // Re-throw to be caught by the calling component
+    let errorMessage = "An unexpected error occurred.";
+    if (error.response) {
+      const status = error.response.status;
+      switch (status) {
+        case 400:
+          errorMessage = error.response.data?.error || "Bad request. Please check your data.";
+          break;
+        case 401:
+          errorMessage = "Your session has expired. Please login again.";
+          break;
+        case 403:
+          errorMessage = "You don't have permission to perform this action.";
+          break;
+        case 404:
+          errorMessage = "The requested resource was not found.";
+          break;
+        case 409:
+          errorMessage = error.response.data?.error || "This record already exists.";
+          break;
+        case 422:
+          errorMessage = "Validation error. Please check your inputs.";
+          break;
+        case 500:
+          errorMessage = "The server is currently down. Please try again later.";
+          break;
+        default:
+          errorMessage = `Error ${status}: ${error.response.data?.error || "Something went wrong."}`;
+      }
+    } else if (error.request) {
+      errorMessage = "No response from server. Check your internet connection.";
+    } else {
+      errorMessage = error.message;
+    }
+    
+    // Attach descriptive message to the error object before re-throwing
+    error.message = errorMessage;
+    console.error("API Error mapped:", errorMessage);
+    throw error; // Re-throw with descriptive message
   }
 };
 
