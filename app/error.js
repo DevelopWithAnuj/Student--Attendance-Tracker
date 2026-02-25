@@ -43,10 +43,9 @@ export default function Error({
         </Button>
       </div>
       {process.env.NODE_ENV === 'development' && (
-        <pre className="mt-8 p-4 bg-muted rounded text-left overflow-auto max-w-full text-xs border border-border">
+        <pre className="mt-8 p-4 bg-muted rounded text-left overflow-auto max-w-full text-xs border border-border whitespace-pre-wrap">
           {error.message}
-          {'
-'}
+          {'\n'}
           {error.stack}
         </pre>
       )}
