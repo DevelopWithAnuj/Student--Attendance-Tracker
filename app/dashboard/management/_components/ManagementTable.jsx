@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Edit, Trash, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 const ManagementTable = ({
   title,
@@ -42,8 +43,21 @@ const ManagementTable = ({
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogState, setDialogState] = useState({ type: null, data: null });
-  const [newItemValue, setNewItemValue] = useState("");
-  const [validationError, setValidationError] = useState("");
+  
+  const { 
+    register: registerAdd, 
+    handleSubmit: handleSubmitAdd, 
+    reset: resetAdd, 
+    formState: { errors: errorsAdd } 
+  } = useForm();
+
+  const { 
+    register: registerEdit, 
+    handleSubmit: handleSubmitEdit, 
+    reset: resetEdit, 
+    setValue: setValueEdit,
+    formState: { errors: errorsEdit } 
+  } = useForm();
 
   const loadData = async () => {
     setLoading(true);
@@ -61,33 +75,24 @@ const ManagementTable = ({
     loadData();
   }, [fetchData]);
 
-  const handleCreate = async () => {
-    if (!newItemValue.trim()) {
-      setValidationError(`${dataKey} cannot be empty.`);
-      return;
-    }
-    setValidationError("");
+  const handleCreate = async (formData) => {
     try {
-      await createData({ [dataKey]: newItemValue });
+      await createData(formData);
       toast.success(`${title} created successfully.`);
       setDialogState({ type: null, data: null });
-      setNewItemValue("");
+      resetAdd();
       loadData();
     } catch (error) {
       toast.error(`Failed to create ${title.toLowerCase()}.`);
     }
   };
 
-  const handleUpdate = async () => {
-    if (!dialogState.data || !dialogState.data[dataKey]?.trim()) {
-      setValidationError(`${dataKey} cannot be empty.`);
-      return;
-    }
-    setValidationError("");
+  const handleUpdate = async (formData) => {
     try {
-      await updateData({ id: dialogState.data.id, [dataKey]: dialogState.data[dataKey] });
+      await updateData({ id: dialogState.data.id, ...formData });
       toast.success(`${title} updated successfully.`);
       setDialogState({ type: null, data: null });
+      resetEdit();
       loadData();
     } catch (error) {
       toast.error(`Failed to update ${title.toLowerCase()}.`);
@@ -113,8 +118,7 @@ const ManagementTable = ({
           onOpenChange={(isOpen) => {
             if (!isOpen) {
               setDialogState({ type: null, data: null });
-              setNewItemValue("");
-              setValidationError("");
+              resetAdd();
             }
           }}
         >
@@ -127,28 +131,28 @@ const ManagementTable = ({
             <DialogHeader>
               <DialogTitle>Add New {title}</DialogTitle>
             </DialogHeader>
-            <div className="py-4">
+            <form onSubmit={handleSubmitAdd(handleCreate)} className="py-4">
               <Input
                 placeholder={`Enter ${dataKey}`}
-                value={newItemValue}
-                onChange={(e) => {
-                  setNewItemValue(e.target.value);
-                  setValidationError("");
-                }}
+                {...registerAdd(dataKey, { required: `${dataKey} is required` })}
               />
-              {validationError && (
-                <p className="text-red-500 text-sm mt-1">{validationError}</p>
+              {errorsAdd[dataKey] && (
+                <p className="text-red-500 text-sm mt-1">{errorsAdd[dataKey].message}</p>
               )}
               <div className="flex justify-end gap-2 mt-4">
                 <Button
+                  type="button"
                   variant="ghost"
-                  onClick={() => setDialogState({ type: null, data: null })}
+                  onClick={() => {
+                    setDialogState({ type: null, data: null });
+                    resetAdd();
+                  }}
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleCreate}>Create</Button>
+                <Button type="submit">Create</Button>
               </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -176,7 +180,7 @@ const ManagementTable = ({
                     onOpenChange={(isOpen) => {
                       if (!isOpen) {
                         setDialogState({ type: null, data: null });
-                        setValidationError("");
+                        resetEdit();
                       }
                     }}
                   >
@@ -186,7 +190,7 @@ const ManagementTable = ({
                         size="icon"
                         onClick={() => {
                             setDialogState({ type: "edit", data: item });
-                            setValidationError(""); // Clear error on opening edit
+                            setValueEdit(dataKey, item[dataKey]);
                         }}
                       >
                         <Edit className="h-4 w-4" />
@@ -196,31 +200,28 @@ const ManagementTable = ({
                       <DialogHeader>
                         <DialogTitle>Edit {title}</DialogTitle>
                       </DialogHeader>
-                      <div className="py-4">
+                      <form onSubmit={handleSubmitEdit(handleUpdate)} className="py-4">
                         <Input
                           placeholder={`Enter ${dataKey}`}
-                          value={dialogState.data?.[dataKey] || ""}
-                          onChange={(e) => {
-                            setDialogState((prev) => ({
-                              ...prev,
-                              data: { ...prev.data, [dataKey]: e.target.value },
-                            }));
-                            setValidationError("");
-                          }}
+                          {...registerEdit(dataKey, { required: `${dataKey} is required` })}
                         />
-                        {validationError && (
-                            <p className="text-red-500 text-sm mt-1">{validationError}</p>
+                        {errorsEdit[dataKey] && (
+                            <p className="text-red-500 text-sm mt-1">{errorsEdit[dataKey].message}</p>
                         )}
                         <div className="flex justify-end gap-2 mt-4">
                           <Button
+                            type="button"
                             variant="ghost"
-                            onClick={() => setDialogState({ type: null, data: null })}
+                            onClick={() => {
+                              setDialogState({ type: null, data: null });
+                              resetEdit();
+                            }}
                           >
                             Cancel
                           </Button>
-                          <Button onClick={handleUpdate}>Update</Button>
+                          <Button type="submit">Update</Button>
                         </div>
-                      </div>
+                      </form>
                     </DialogContent>
                   </Dialog>
                   <AlertDialog>
