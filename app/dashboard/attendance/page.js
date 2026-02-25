@@ -10,6 +10,7 @@ import moment from "moment";
 import React, { useState, useEffect } from "react";
 import StudentAttendanceGrid from "./_components/StudentAttendanceGrid";
 import { LucideHand, SearchIcon, SquareArrowDownIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Attendance() {
   const [loading, setLoading] = useState(false);
@@ -231,8 +232,9 @@ function Attendance() {
       </div>
 
       {loading ? (
-        <div className="text-center p-5 text-lg">
-          Loading Attendance Data...
+        <div className="mt-4">
+          <Skeleton className="h-12 w-full mb-4" />
+          <Skeleton className="h-[400px] w-full" />
         </div>
       ) : (
         <StudentAttendanceGrid

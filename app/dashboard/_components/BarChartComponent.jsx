@@ -13,8 +13,10 @@ import moment from "moment";
 
 function BarChartComponent({ attendance }) {
   const [data, setData] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     formatAttendanceList();
   }, [attendance]);
 
@@ -48,6 +50,9 @@ function BarChartComponent({ attendance }) {
 
     setData(chartData);
   };
+
+  if (!isMounted) return <div className="mt-4 p-5 border rounded-lg h-[300px] animate-pulse bg-muted" />;
+
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Daily Attendance Chart</h3>

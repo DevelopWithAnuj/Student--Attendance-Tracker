@@ -15,6 +15,7 @@ import { LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 
 import { useNotifications } from "../_context/NotificationContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
   const { setTheme } = useTheme();
@@ -260,8 +261,23 @@ const Dashboard = () => {
         </div>
       </div>
       {overallLoading ? (
-        <div className="text-center p-5 text-lg text-muted-foreground">
-          Loading Dashboard Data...
+        <div className="mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <Skeleton className="h-[400px] w-full" />
+            </div>
+            <div className="md:col-span-1">
+              <Skeleton className="h-[400px] w-full" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <Skeleton className="h-[300px] w-full" />
+          </div>
         </div>
       ) : (
         <>

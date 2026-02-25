@@ -17,7 +17,7 @@ import { LoaderIcon } from "lucide-react";
 function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (open) return;
@@ -74,99 +74,123 @@ function AddNewStudent({ refreshData, courseList, branchList, yearList }) {
               <label htmlFor="name" className="text-right">
                 Full Name
               </label>
-              <Input
-                placeholder="John Doe"
-                id="name"
-                type="text"
-                className="col-span-3"
-                {...register("name", { required: true })}
-              />
+              <div className="col-span-3">
+                <Input
+                  placeholder="John Doe"
+                  id="name"
+                  type="text"
+                  {...register("name", { required: "Name is required" })}
+                />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="email" className="text-right">
                 Email
               </label>
-              <Input
-                placeholder="jonedoe@example.com"
-                id="email"
-                type="email"
-                className="col-span-3"
-                {...register("email", { required: true })}
-              />
+              <div className="col-span-3">
+                <Input
+                  placeholder="jonedoe@example.com"
+                  id="email"
+                  type="email"
+                  {...register("email", { 
+                    required: "Email is required",
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Invalid email address"
+                    }
+                  })}
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="phone" className="text-right">
                 Phone
               </label>
-              <Input
-                placeholder="9876543210"
-                id="phone"
-                type={"number"}
-                className="col-span-3"
-                {...register("phone")}
-              />
+              <div className="col-span-3">
+                <Input
+                  placeholder="9876543210"
+                  id="phone"
+                  type={"number"}
+                  {...register("phone")}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="course" className="text-right">
                 Course
               </label>
-              <select
-                id="course"
-                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
-                {...register("courseId", { required: true })}
-              >
-                {Array.isArray(courseList) &&
-                  courseList.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.name}
-                    </option>
-                  ))}
-              </select>
+              <div className="col-span-3">
+                <select
+                  id="course"
+                  className="w-full border border-input p-2 rounded-md bg-background text-foreground"
+                  {...register("courseId", { required: "Course is required" })}
+                >
+                  <option value="">Select Course</option>
+                  {Array.isArray(courseList) &&
+                    courseList.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.name}
+                      </option>
+                    ))}
+                </select>
+                {errors.courseId && <p className="text-red-500 text-xs mt-1">{errors.courseId.message}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="branch" className="text-right">
                 Branch
               </label>
-              <select
-                id="branch"
-                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
-                {...register("branchId", { required: true })}
-              >
-                {Array.isArray(branchList) &&
-                  branchList.map((branch) => (
-                    <option key={branch.id} value={branch.id}>
-                      {branch.name}
-                    </option>
-                  ))}
-              </select>
+              <div className="col-span-3">
+                <select
+                  id="branch"
+                  className="w-full border border-input p-2 rounded-md bg-background text-foreground"
+                  {...register("branchId", { required: "Branch is required" })}
+                >
+                  <option value="">Select Branch</option>
+                  {Array.isArray(branchList) &&
+                    branchList.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name}
+                      </option>
+                    ))}
+                </select>
+                {errors.branchId && <p className="text-red-500 text-xs mt-1">{errors.branchId.message}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="year" className="text-right">
                 Year
               </label>
-              <select
-                id="year"
-                className="col-span-3 border border-input p-2 rounded-md bg-background text-foreground"
-                {...register("yearId", { required: true })}
-              >
-                {Array.isArray(yearList) &&
-                  yearList.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.value}
-                    </option>
-                  ))}
-              </select>
+              <div className="col-span-3">
+                <select
+                  id="year"
+                  className="w-full border border-input p-2 rounded-md bg-background text-foreground"
+                  {...register("yearId", { required: "Year is required" })}
+                >
+                  <option value="">Select Year</option>
+                  {Array.isArray(yearList) &&
+                    yearList.map((year) => (
+                      <option key={year.id} value={year.id}>
+                        {year.value}
+                      </option>
+                    ))}
+                </select>
+                {errors.yearId && <p className="text-red-500 text-xs mt-1">{errors.yearId.message}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="address" className="text-right">
                 Address
               </label>
-              <Input
-                placeholder="123, Main Street, City, Country"
-                id="address"
-                className="col-span-3"
-                {...register("address")}
-              />
+              <div className="col-span-3">
+                <Input
+                  placeholder="123, Main Street, City, Country"
+                  id="address"
+                  {...register("address")}
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <Button

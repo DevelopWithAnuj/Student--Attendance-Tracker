@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LayoutListIcon, MenuSquare } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Student = () => {
   const [studentList, setStudentList] = useState([]);
@@ -128,7 +129,10 @@ const Student = () => {
       </div>
 
       {loading ? (
-        <div className="text-center p-10">Loading...</div>
+        <div className="mt-4">
+          <Skeleton className="h-10 w-full mb-4" />
+          <Skeleton className="h-[500px] w-full" />
+        </div>
       ) : (
         <StudentListTable
           ref={studentTableRef} // Pass the ref to StudentListTable

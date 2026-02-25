@@ -12,6 +12,14 @@ import {
 } from "recharts";
 
 const TrendChartComponent = ({ data }) => {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return <div className="mt-4 p-5 border rounded-lg h-[300px] animate-pulse bg-muted" />;
+
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-lg font-semibold mb-4">Attendance Trend</h3>

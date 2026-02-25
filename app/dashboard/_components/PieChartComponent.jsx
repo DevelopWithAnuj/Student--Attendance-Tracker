@@ -18,8 +18,10 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
 function PieChartComponent({ attendance }) {
   const [data, setData] = useState([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (attendance && attendance.length > 0) {
       let totalPresent = 0;
       let totalAbsent = 0;
@@ -44,6 +46,8 @@ function PieChartComponent({ attendance }) {
         setData([]);
     }
   }, [attendance]);
+
+  if (!isMounted) return <div className="mt-4 p-5 border rounded-lg h-[300px] animate-pulse bg-muted" />;
 
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
