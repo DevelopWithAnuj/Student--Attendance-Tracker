@@ -81,165 +81,156 @@ const CustomButtons = ({ rowData, courses, branches, years, onDeleteSuccess }) =
   };
 
   return (
-    <div className="flex gap-2">
-      <button
+    <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={handleEdit}
-        className="p-2 rounded-md bg-blue-100 text-blue-600 hover:bg-blue-200"
+        className="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
       >
         <Edit className="h-4 w-4" />
-      </button>
+      </Button>
+      
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <button className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 dark:bg-rose-900/20 dark:text-rose-400"
+          >
             <Trash2 className="h-4 w-4" />
-          </button>
+          </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Student</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this student? This action cannot
-              be undone.
+            <AlertDialogTitle className="text-xl font-black">Delete Student Record</AlertDialogTitle>
+            <AlertDialogDescription className="font-medium">
+              Are you sure you want to remove <span className="text-slate-900 dark:text-white font-bold">{rowData.name}</span>? This action cannot be reversed.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex gap-2 justify-end">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <div className="flex gap-3 justify-end mt-4">
+            <AlertDialogCancel className="rounded-xl font-bold h-11 px-6">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 deleteRecord(rowData?.id)
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-rose-600 hover:bg-rose-700 rounded-xl font-bold h-11 px-6"
             >
-              Delete
+              Delete Student
             </AlertDialogAction>
           </div>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Edit Dialog */}
+      {/* Edit Dialog - Refactored for mobile responsiveness */}
       <AlertDialog open={editOpen} onOpenChange={setEditOpen}>
-        <AlertDialogContent className="max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Edit Student</AlertDialogTitle>
-            <AlertDialogDescription>
-              Update the student details.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <form onSubmit={handleSubmit(onEditSubmit)} className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-name" className="text-right">
-                Full Name
-              </label>
+        <AlertDialogContent className="max-w-2xl max-h-[92vh] p-0 overflow-hidden border-none shadow-2xl rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-950 flex flex-col">
+          <div className="p-6 sm:p-8 pb-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-xl sm:text-2xl font-black tracking-tight">Edit Student Profile</AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-500 font-medium text-xs sm:text-sm">
+                Update information for {rowData.name}.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </div>
+
+          <form onSubmit={handleSubmit(onEditSubmit)} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                <Input
+                  placeholder="John Doe"
+                  className="h-11 sm:h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 focus:ring-primary/20 font-bold text-sm"
+                  {...register("name", { required: true })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <Input
+                  placeholder="johndoe@example.com"
+                  type="email"
+                  className="h-11 sm:h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 focus:ring-primary/20 font-bold text-sm"
+                  {...register("email", { required: true })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+                <Input
+                  placeholder="9876543210"
+                  type="number"
+                  className="h-11 sm:h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 focus:ring-primary/20 font-bold text-sm"
+                  {...register("phone")}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assigned Course</label>
+                <select
+                  className="w-full h-11 sm:h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none cursor-pointer text-sm"
+                  {...register("courseId", { required: true })}
+                >
+                  {Array.isArray(courses) &&
+                    courses.map((course) => (
+                      <option key={course.id} value={course.id} className="dark:bg-slate-950">
+                        {course.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Branch</label>
+                <select
+                  className="w-full h-11 sm:h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none cursor-pointer text-sm"
+                  {...register("branchId", { required: true })}
+                >
+                  {Array.isArray(branches) &&
+                    branches.map((branch) => (
+                      <option key={branch.id} value={branch.id} className="dark:bg-slate-950">
+                        {branch.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Year</label>
+                <select
+                  className="w-full h-11 sm:h-12 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 text-slate-700 dark:text-slate-200 font-bold focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none cursor-pointer text-sm"
+                  {...register("yearId", { required: true })}
+                >
+                  {Array.isArray(years) &&
+                    years.map((year) => (
+                      <option key={year.id} value={year.id} className="dark:bg-slate-950">
+                        {year.value}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Residential Address</label>
               <Input
-                placeholder="John Doe"
-                id="edit-name"
-                type="text"
-                className="col-span-3"
-                {...register("name", { required: true })}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-email" className="text-right">
-                Email
-              </label>
-              <Input
-                placeholder="johndoe@example.com"
-                id="edit-email"
-                type="email"
-                className="col-span-3"
-                {...register("email", { required: true })}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-phone" className="text-right">
-                Phone
-              </label>
-              <Input
-                placeholder="9876543210"
-                id="edit-phone"
-                type="number"
-                className="col-span-3"
-                {...register("phone")}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-course" className="text-right">
-                Course
-              </label>
-              <select
-                id="edit-course"
-                className="col-span-3 border p-2 rounded-md"
-                {...register("courseId", { required: true })}
-              >
-                {Array.isArray(courses) &&
-                  courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-branch" className="text-right">
-                Branch
-              </label>
-              <select
-                id="edit-branch"
-                className="col-span-3 border p-2 rounded-md"
-                {...register("branchId", { required: true })}
-              >
-                {Array.isArray(branches) &&
-                  branches.map((branch) => (
-                    <option key={branch.id} value={branch.id}>
-                      {branch.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-year" className="text-right">
-                Year
-              </label>
-              <select
-                id="edit-year"
-                className="col-span-3 border p-2 rounded-md"
-                {...register("yearId", { required: true })}
-              >
-                {Array.isArray(years) &&
-                  years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      {year.value}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-address" className="text-right">
-                Address
-              </label>
-              <Input
-                placeholder="123, Main Street, City, Country"
-                id="edit-address"
-                className="col-span-3"
+                placeholder="Address"
+                className="h-11 sm:h-12 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30 focus:ring-primary/20 font-bold text-sm"
                 {...register("address")}
               />
             </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setEditOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-blue-600 text-white hover:bg-blue-800"
-              >
-                Update Student
-              </Button>
-            </div>
           </form>
+
+          <div className="p-6 sm:p-8 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setEditOpen(false)}
+              className="h-11 sm:h-12 px-6 sm:px-8 rounded-xl font-bold text-slate-500"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit(onEditSubmit)}
+              className="h-11 sm:h-12 px-8 sm:px-10 rounded-xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02]"
+            >
+              Save Changes
+            </Button>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </div>

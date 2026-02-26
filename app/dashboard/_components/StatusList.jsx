@@ -55,23 +55,25 @@ function StatusList({ attendanceList }) {
   }, [attendanceList]); // Depends on attendanceList
 
   return (
-    <div className="mt-4 p-4 border rounded-lg shadow-sm bg-card">
-      <h3 className="text-xl font-semibold mb-4 text-foreground">Attendance Summary</h3>
-      <div className="gap-4 my-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card
           icon={<GraduationCapIcon />}
-          title="Total Students"
+          title="Students Tracked"
           value={totalStudentsWithRecords}
+          colorClass="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
         />
         <Card
           icon={<TrendingUp />}
-          title="Total Present"
+          title="Presence Rate"
           value={`${presentPercentage}%`}
+          colorClass="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
         />
         <Card
           icon={<TrendingDown />}
-          title="Total Absent"
+          title="Absence Rate"
           value={`${(100 - parseFloat(presentPercentage)).toFixed(2)}%`}
+          colorClass="bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400"
         />
       </div>
     </div>

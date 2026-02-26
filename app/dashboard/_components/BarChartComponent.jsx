@@ -60,20 +60,35 @@ function BarChartComponent({ attendance }) {
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Daily Attendance Chart</h3>
       {data.length > 0 ? (
-        <ResponsiveContainer width="100%" aspect={1.5}>
-          <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip cursor={{fill: 'transparent'}} />
-            <Legend />
-            <Bar dataKey="Present" fill="#4ade80" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Absent" fill="#ef4444" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Late" fill="#facc15" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="On Leave" fill="#60a5fa" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Holiday" fill="#9ca3af" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="h-[350px] sm:h-[450px] w-full mt-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <Tooltip 
+                cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+              />
+              <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ paddingBottom: '20px' }} />
+              <Bar dataKey="Present" fill="#4ade80" radius={[4, 4, 0, 0]} barSize={12} />
+              <Bar dataKey="Absent" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={12} />
+              <Bar dataKey="Late" fill="#facc15" radius={[4, 4, 0, 0]} barSize={12} />
+              <Bar dataKey="On Leave" fill="#60a5fa" radius={[4, 4, 0, 0]} barSize={12} />
+              <Bar dataKey="Holiday" fill="#9ca3af" radius={[4, 4, 0, 0]} barSize={12} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       ) : (
         <div className="h-[300px]">
           <EmptyState 

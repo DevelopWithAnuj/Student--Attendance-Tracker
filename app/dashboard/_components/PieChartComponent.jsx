@@ -60,22 +60,29 @@ function PieChartComponent({ attendance }) {
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Monthly Attendance Summary</h3>
       {data && data.length > 0 && data.some(item => item.value > 0) ? (
-        <ResponsiveContainer width="100%" aspect={1.5}>
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={120}
-              labelLine={true}
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-            />
-            <Legend verticalAlign="bottom" height={36}/>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="h-[300px] sm:h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius="40%"
+                outerRadius="70%"
+                paddingAngle={5}
+                labelLine={true}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              >
+              </Pie>
+              <Tooltip 
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+              />
+              <Legend verticalAlign="top" height={36}/>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       ) : (
         <div className="h-[300px]">
           <EmptyState 

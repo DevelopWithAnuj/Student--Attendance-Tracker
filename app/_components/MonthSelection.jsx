@@ -19,10 +19,10 @@ function MonthSelection({ selectedMonth, onMonthChange, id }) {
           <Button
             id={id}
             variant="outline"
-            className="flex gap-2 items-center text-slate-500 dark:text-gray-300"
+            className="w-full h-12 flex gap-3 items-center justify-start px-4 font-bold text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-all shadow-sm"
           >
-            <CalendarDays className="h-5 w-5" />
-            {moment(selectedMonth).format("MMM yyyy")}
+            <CalendarDays className="h-5 w-5 text-primary" />
+            {moment(selectedMonth).format("MMMM YYYY")}
           </Button>
         </PopoverTrigger>
         <PopoverContent>

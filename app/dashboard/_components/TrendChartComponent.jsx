@@ -26,31 +26,44 @@ const TrendChartComponent = ({ data }) => {
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-lg font-semibold mb-4">Attendance Trend</h3>
       {data && data.length > 0 ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={data}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="date" />
-            <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-            <Tooltip formatter={(value) => [`${value}%`, 'Attendance']} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="percentage"
-              stroke="#8884d8"
-              strokeWidth={3}
-              dot={{ r: 4 }}
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="h-[300px] sm:h-[350px] w-full mt-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={data}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
+              <XAxis 
+                dataKey="date" 
+                axisLine={false} 
+                tickLine={false}
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                dy={10}
+              />
+              <YAxis 
+                domain={[0, 100]} 
+                tickFormatter={(val) => `${val}%`}
+                axisLine={false} 
+                tickLine={false}
+                tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <Tooltip 
+                formatter={(value) => [`${value}%`, 'Attendance']} 
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+              />
+              <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ paddingBottom: '20px' }} />
+              <Line
+                type="monotone"
+                dataKey="percentage"
+                name="Attendance Rate"
+                stroke="#8884d8"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#8884d8', strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 8, strokeWidth: 0 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       ) : (
         <div className="h-[250px]">
           <EmptyState 

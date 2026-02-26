@@ -80,42 +80,47 @@ const Student = () => {
   };
 
   return (
-    <div className="p-4 sm:p-7">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-        <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
-          <LayoutListIcon className="h-8 w-8 text-muted-foreground" />
-          Students
-        </h2>
-        <div className="flex flex-wrap items-center gap-2 justify-end">
+    <div className="p-4 sm:p-6 lg:p-10 bg-slate-50/30 min-h-screen">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+          <h2 className="font-extrabold text-3xl tracking-tight flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <LayoutListIcon className="h-8 w-8 text-primary" />
+            </div>
+            Student Directory
+          </h2>
+          <p className="text-muted-foreground mt-1 ml-13">Manage and organize student records efficiently.</p>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex bg-white dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-bold text-slate-600" onClick={handleExportCSV}>
+              CSV
+            </Button>
+            <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-800 self-center mx-1" />
+            <Button variant="ghost" size="sm" className="h-9 px-4 rounded-lg font-bold text-slate-600" onClick={handleExportPDF}>
+              PDF
+            </Button>
+          </div>
+          
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8">
-                <MenuSquare className="h-4 w-4" /> Menu
+              <Button variant="outline" className="h-11 px-4 rounded-xl border-slate-200 dark:border-slate-800 shadow-sm font-bold gap-2">
+                <MenuSquare className="h-4 w-4" />
+                Actions
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-48 p-2">
-              <div className="grid gap-2">
+            <PopoverContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl" align="end">
+              <div className="grid gap-1">
                 <Button
                   onClick={handleSync}
                   variant="ghost"
-                  className="justify-start"
+                  className="justify-start h-10 rounded-lg font-bold text-slate-600"
                 >
-                  Sync DB
+                  Sync Database
                 </Button>
-                <Button
-                  onClick={handleExportCSV}
-                  variant="ghost"
-                  className="justify-start"
-                >
-                  Export to CSV
-                </Button>
-                <Button
-                  onClick={handleExportPDF}
-                  variant="ghost"
-                  className="justify-start"
-                >
-                  Export to PDF
-                </Button>
+                <div className="h-[1px] bg-slate-100 dark:bg-slate-800 my-1" />
+                <p className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Manage</p>
                 <AddNewStudent
                   courseList={courseList}
                   branchList={branchList}
@@ -129,16 +134,18 @@ const Student = () => {
       </div>
 
       {loading ? (
-        <div className="mt-4">
-          <Skeleton className="h-10 w-full mb-4" />
-          <Skeleton className="h-[500px] w-full" />
+        <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 space-y-4">
+          <Skeleton className="h-12 w-full max-w-sm rounded-xl" />
+          <Skeleton className="h-[500px] w-full rounded-xl" />
         </div>
       ) : (
-        <StudentListTable
-          ref={studentTableRef} // Pass the ref to StudentListTable
-          studentList={studentList}
-          refreshData={refreshStudentList}
-        />
+        <div className="animate-in fade-in duration-500">
+          <StudentListTable
+            ref={studentTableRef}
+            studentList={studentList}
+            refreshData={refreshStudentList}
+          />
+        </div>
       )}
     </div>
   );

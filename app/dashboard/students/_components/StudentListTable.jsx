@@ -68,34 +68,38 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
   }, [studentList, courseList, branchList, yearList]);
 
   // Set column definitions
-  useEffect(() => {
+    useEffect(() => {
     setColumnDef([
-      { headerName: "ID", field: "id", sortable: true, filter: true, pinned: 'left', width: 100 },
-      { headerName: "Name", field: "name", sortable: true, filter: true, pinned: 'left', width: 150 },
-      { headerName: "Email", field: "email", sortable: true, filter: true },
-      { headerName: "Phone", field: "phone", sortable: true, filter: true },
+      { headerName: "ID", field: "id", sortable: true, filter: true, pinned: 'left', width: 90 },
+      { headerName: "Name", field: "name", sortable: true, filter: true, pinned: 'left', width: 170, flex: 1, minWidth: 140 },
+      { headerName: "Email", field: "email", sortable: true, filter: true, flex: 1, minWidth: 200 },
+      { headerName: "Phone", field: "phone", sortable: true, filter: true, width: 150 },
       {
         headerName: "Course",
         field: "course",
         sortable: true,
         filter: true,
+        width: 130
       },
       {
         headerName: "Branch",
         field: "branch",
         sortable: true,
         filter: true,
+        width: 130
       },
       {
         headerName: "Year",
         field: "year",
         sortable: true,
         filter: true,
+        width: 100
       },
-      { headerName: "Address", field: "address", sortable: true, filter: true },
+      { headerName: "Address", field: "address", sortable: true, filter: true, flex: 1, minWidth: 200 },
       {
         headerName: "Actions",
         field: "actions",
+        width: 120,
         cellRenderer: (params) => (
           <CustomButtons 
             rowData={params.data}
@@ -158,34 +162,47 @@ const StudentListTable = forwardRef(({ studentList, refreshData }, ref) => {
   // Removed onFirstDataRendered and related useEffect
 
   return (
-    <div>
-      <div className="flex gap-2 items-center mb-4 w-full sm:max-w-sm">
-        <Search className="h-4 w-4 text-gray-400" />
-        <Input
-          type="text"
-          placeholder="Search on Anything..."
-          onChange={(e) => {
-            const v = e.target.value;
-            setSearchInput(v);
-              if (gridApiRef.current && typeof gridApiRef.current.setQuickFilter === "function") {
-              gridApiRef.current.setQuickFilter(v);
-            }
-          }}
-          value={searchInput}
-          className="p-2"
-        />
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 md:p-6">
+        <div className="relative w-full lg:max-w-md">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+            <Search className="h-5 w-5" />
+          </div>
+          <Input
+            type="text"
+            placeholder="Search student by any field..."
+            onChange={(e) => {
+              const v = e.target.value;
+              setSearchInput(v);
+                if (gridApiRef.current && typeof gridApiRef.current.setQuickFilter === "function") {
+                gridApiRef.current.setQuickFilter(v);
+              }
+            }}
+            value={searchInput}
+            className="pl-12 h-12 bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 focus:ring-primary/20 transition-all rounded-xl font-medium"
+          />
+        </div>
       </div>
-      <div className="ag-theme-alpine" style={{ height: "calc(100vh - 250px)", width: "100%" }}>
-        <AgGridReact
-          ref={gridRef}
-          rowData={rowData}
-          columnDefs={columnDef}
-          quickFilterText={searchInput}
-          pagination={true}
-          paginationPageSize={10}
-          paginationAutoPageSize={true}
-          onGridReady={onGridReady}
-        />
+
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden p-2">
+        <div className="ag-theme-alpine custom-ag-grid" style={{ height: "calc(100vh - 210px)", width: "100%" }}>
+          <AgGridReact
+            ref={gridRef}
+            rowData={rowData}
+            columnDefs={columnDef}
+            quickFilterText={searchInput}
+            pagination={true}
+            paginationPageSize={10}
+            paginationAutoPageSize={true}
+            onGridReady={onGridReady}
+            rowHeight={55}
+            headerHeight={50}
+            defaultColDef={{
+              resizable: true,
+              suppressMovable: true,
+            }}
+          />
+        </div>
       </div>
     </div>
   );}); // End of forwardRef wrapper

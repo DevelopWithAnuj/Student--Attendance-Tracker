@@ -3,18 +3,18 @@ import SideNav from './_components/SideNav';
 import Header from './_components/Header';
 import { NotificationProvider } from '../_context/NotificationContext';
 
-const Layout= ({children}) => {
+const Layout = ({ children }) => {
   return (
     <NotificationProvider>
-      <div>
-        <div className='md:w-64 fixed hidden md:block'>
+      <div className="min-h-screen bg-slate-50/30 dark:bg-slate-950">
+        <div className='md:w-64 fixed hidden md:block h-full z-50'>
           <SideNav/>
         </div>
-        <div className='md:ml-64'>
+        <div className='md:ml-64 flex flex-col min-h-screen'>
           <Header />
-          <div className='p-4'>
+          <main className='flex-1'>
             {children}
-          </div>
+          </main>
         </div>
       </div>
     </NotificationProvider>

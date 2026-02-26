@@ -246,47 +246,51 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 md:p-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-bold text-2xl align-middle flex items-center gap-2">
-          <LayoutDashboard className="h-8 w-8 text-muted-foreground" />
-          Dashboard
-        </h2>
+    <div className="p-4 sm:p-6 lg:p-10 bg-slate-50/30 min-h-screen">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+          <h2 className="font-extrabold text-3xl tracking-tight flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <LayoutDashboard className="h-8 w-8 text-primary" />
+            </div>
+            Dashboard Overview
+          </h2>
+          <p className="text-muted-foreground mt-1 ml-13">Analyze attendance trends and student engagement.</p>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+           {/* Optional Refresh or Action Button could go here */}
+        </div>
+      </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex gap-2 items-center bg-background">
-            <label htmlFor="month-select" className="text-foreground">
-              Month:
-            </label>
+      {/* Filter Card */}
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Analysis Month</label>
             <MonthSelection
               selectedMonth={selectedMonth}
               onMonthChange={setSelectedMonth}
             />
           </div>
-          <div className="flex gap-2 items-center bg-background">
-            <label htmlFor="course-select" className="text-foreground">
-              Course:
-            </label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Course Filter</label>
             <CourseSelection
               courseList={courseList}
               selectedCourse={selectedCourse}
               onCourseChange={setSelectedCourse}
             />
           </div>
-          <div className="flex gap-2 items-center bg-background">
-            <label htmlFor="branch-select" className="text-foreground">
-              Branch:
-            </label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Branch</label>
             <BranchSelection
               branchList={branchList}
               selectedBranch={selectedBranch}
               onBranchChange={setSelectedBranch}
             />
           </div>
-          <div className="flex gap-2 items-center bg-background">
-            <label htmlFor="year-select" className="text-foreground">
-              Year:
-            </label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic Year</label>
             <YearSelection
               yearList={yearList}
               selectedYear={selectedYear}
@@ -295,40 +299,47 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
       {overallLoading ? (
-        <div className="mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
+        <div className="space-y-8 animate-pulse">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton className="h-32 w-full rounded-2xl" />
+            <Skeleton className="h-32 w-full rounded-2xl" />
+            <Skeleton className="h-32 w-full rounded-2xl" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <Skeleton className="h-[400px] w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Skeleton className="h-[450px] w-full rounded-2xl" />
             </div>
-            <div className="md:col-span-1">
-              <Skeleton className="h-[400px] w-full" />
+            <div className="lg:col-span-1">
+              <Skeleton className="h-[450px] w-full rounded-2xl" />
             </div>
-          </div>
-          <div className="mt-4">
-            <Skeleton className="h-[300px] w-full" />
+            <div className="lg:col-span-3">
+              <Skeleton className="h-[350px] w-full rounded-2xl" />
+            </div>
           </div>
         </div>
       ) : (
-        <>
+        <div className="space-y-8 animate-in fade-in duration-700">
           <StatusList attendanceList={attendanceList} />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
-            <div className="md:col-span-2">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Section: Bar Chart */}
+            <div className="lg:col-span-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
               <BarChartComponent attendance={attendanceList} />
             </div>
-            <div className="md:col-span-1">
+
+            {/* Side Section: Pie Chart */}
+            <div className="lg:col-span-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
               <PieChartComponent attendance={attendanceList} />
             </div>
+
+            {/* Bottom Section: Trend Chart */}
+            <div className="lg:col-span-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
+              <TrendChartComponent data={trendData} />
+            </div>
           </div>
-          <div className="mt-4 md:col-span-1">
-            <TrendChartComponent data={trendData} />
-          </div>
-        </>
+        </div>
       )}
     </div>
   );

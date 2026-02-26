@@ -27,50 +27,54 @@ const Header = () => {
 
   return (
     <div
-      className="p-4 shadow-sm border-b flex justify-between items-center "
+      className="p-4 px-8 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex justify-between items-center sticky top-0 z-50 shadow-sm"
     >
-      <div className="text-xl font-bold text-foreground">
-        Student Attendance Tracker
-      </div>
       <div className="flex items-center gap-4">
+        {isClient && isMobile && <MobileSideNav user={user} />}
+        <div className="hidden md:block">
+          <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Platform</h2>
+          <p className="text-xs font-bold text-slate-900 dark:text-white">Central Management Console</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 pr-6 border-r border-slate-100 dark:border-slate-800">
+           <NotificationBell />
+        </div>
         
-        <NotificationBell />
-        {isClient && isMobile ? ( // Render MobileSideNav on mobile
-          <MobileSideNav user={user} />
-        ) : ( // Render existing user info on desktop
-          <>
-            {user && (
-              <>
-                <div className="text-right hidden md:block">
-                  <p className="text-sm font-medium text-foreground">
-                    Welcome, {user.given_name || user.family_name || "User"}
-                  </p>
-                  <p className="text-xs text-foreground">{user.email}</p>
-                </div>
-                <LogoutLink
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-destructive-foreground rounded-lg transition-colors duration-200"
-                >
-                  Logout
-                </LogoutLink>
-              </>
-            )}
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:block text-right">
+            <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+              {user?.given_name || "Administrator"}
+            </p>
+            <p className="text-[10px] text-slate-400 font-bold tracking-tight">{user?.email}</p>
+          </div>
+
+          <div className="relative group hidden lg:block">
             {user?.picture ? (
               <Image
                 src={user.picture}
                 alt="Profile"
-                width={40}
-                height={40}
-                className="rounded-full border-2 border-gray-200"
+                width={38}
+                height={38}
+                className="rounded-xl border-2 border-white dark:border-slate-900 shadow-lg group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-gray-600 font-semibold">
-                  {user?.given_name?.[0] || user?.email?.[0]?.toUpperCase() || "U"}
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-inner group-hover:scale-105 transition-transform">
+                <span className="text-primary font-black text-xs uppercase">
+                  {user?.given_name?.[0] || "U"}
                 </span>
               </div>
             )}
-          </>
-        )}
+            <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full shadow-sm" />
+          </div>
+
+          <LogoutLink
+            className="hidden lg:flex items-center h-10 px-5 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-400 text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 border border-rose-100 dark:border-rose-900/30"
+          >
+            Sign Out
+          </LogoutLink>
+        </div>
       </div>
     </div>
   );
