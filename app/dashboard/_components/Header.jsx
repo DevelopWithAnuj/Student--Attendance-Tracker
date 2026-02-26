@@ -33,7 +33,7 @@ const Header = () => {
         {isClient && isMobile && <MobileSideNav user={user} />}
         <div className="hidden md:block">
           <h2 className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Platform</h2>
-          <p className="text-xs font-bold text-slate-900 dark:text-white">Central Management Console</p>
+          <p className="text-xs font-bold text-slate-900 dark:text-white underline decoration-primary/30 underline-offset-4">Attendance AI Management Console</p>
         </div>
       </div>
 

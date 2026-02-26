@@ -394,7 +394,7 @@ const Settings = () => {
 
           <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-               &copy; 2026 Student Attendance Tracker System
+               &copy; 2026 Attendance AI Systems &bull; Institutional Division
              </p>
              <div className="flex gap-6">
                 <span onClick={() => setActiveModal('security')} className="text-xs font-black text-primary hover:underline cursor-pointer">Security Policy</span>

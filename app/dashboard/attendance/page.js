@@ -155,9 +155,9 @@ function Attendance() {
             <div className="p-2 bg-primary/10 rounded-lg">
               <LucideHand className="h-8 w-8 text-primary" />
             </div>
-            Attendance Management
+            Attendance Intelligence
           </h2>
-          <p className="text-muted-foreground mt-1 ml-13">Monitor and track student presence efficiently.</p>
+          <p className="text-muted-foreground mt-1 ml-13">High-fidelity student presence tracking and reporting.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
