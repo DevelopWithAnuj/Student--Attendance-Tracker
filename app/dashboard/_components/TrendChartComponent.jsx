@@ -36,15 +36,17 @@ const TrendChartComponent = ({ data }) => {
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
+            <Tooltip formatter={(value) => [`${value}%`, 'Attendance']} />
             <Legend />
             <Line
               type="monotone"
               dataKey="percentage"
               stroke="#8884d8"
+              strokeWidth={3}
+              dot={{ r: 4 }}
               activeDot={{ r: 8 }}
             />
           </LineChart>

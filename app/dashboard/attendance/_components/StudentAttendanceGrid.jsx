@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import moment from "moment";
-import AttendanceCheckbox from "./AttendanceCheckbox";
+import AttendanceStatusSelect from "./AttendanceStatusSelect";
 import { Button } from "@/components/ui/button";
 import GlobalApi from "@/app/_services/GlobalApi";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
@@ -61,7 +61,7 @@ function StudentAttendanceGrid({
           if (newStudentAttendance[studentId]) { // Check if student exists in the new list
             const day = getDayOfMonth(record.attendance.date);
             newStudentAttendance[studentId].attendance[day] =
-              record.attendance.present;
+              record.attendance.status;
           }
         }
       });
@@ -70,13 +70,13 @@ function StudentAttendanceGrid({
     console.log("newStudentAttendance (after set):", newStudentAttendance); // Debug log
   }, [attendanceList, selectedMonth, allStudents]);
 
-  const onAttendanceChange = (studentId, day, isPresent) => {
+  const onAttendanceChange = (studentId, day, status) => {
     setAttendance((prev) => {
       const newAttendance = { ...prev };
       if (!newAttendance[studentId]) {
         newAttendance[studentId] = {};
       }
-      newAttendance[studentId][day] = isPresent;
+      newAttendance[studentId][day] = status;
       return newAttendance;
     });
   };
@@ -94,13 +94,13 @@ function StudentAttendanceGrid({
         const currentDayMoment = moment(selectedMonth).date(day).startOf("day");
         // Only save attendance for past or current days, NOT future days
         if (!currentDayMoment.isAfter(today, "day")) {
-          const isPresent = attendance[studentId][day];
-          // Only push if there's a defined attendance state (true/false)
-          if (isPresent !== undefined) {
+          const status = attendance[studentId][day];
+          // Only push if there's a defined attendance state
+          if (status !== undefined) {
             const date = currentDayMoment.format("YYYY-MM-DD");
             attendanceData.push({
               studentId: parseInt(studentId),
-              present: isPresent,
+              status: status,
               day: parseInt(day),
               date: date,
             });
@@ -142,6 +142,18 @@ function StudentAttendanceGrid({
     );
   }, [allStudents, filterText]);
 
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterText]);
+
+  const paginatedStudents = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredStudents.slice(startIndex, startIndex + pageSize);
+  }, [filteredStudents, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(filteredStudents.length / pageSize);
+
   const exportToCSV = () => {
     const headers = ["Student Name", ...Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`)];
     const csvContent = [
@@ -151,12 +163,8 @@ function StudentAttendanceGrid({
         for (let day = 1; day <= daysInMonth; day++) {
           const recordedAttendance = studentAttendance[student.id]?.attendance[day];
           const pendingAttendance = attendance[student.id]?.[day];
-          const displayAttendance = pendingAttendance !== undefined ? pendingAttendance : recordedAttendance;
-          let status = "";
-          if (displayAttendance === true) status = "Present";
-          else if (displayAttendance === false) status = "Absent";
-          else status = "Not Marked";
-          row.push(status);
+          const displayStatus = pendingAttendance !== undefined ? pendingAttendance : recordedAttendance;
+          row.push(displayStatus || "-");
         }
         return row.join(",");
       })
@@ -173,31 +181,30 @@ function StudentAttendanceGrid({
     document.body.removeChild(link);
   };
 
-  // Reset to page 1 when filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filterText]);
+  const getStatusDisplay = (status) => {
+    if (!status) return <span className="text-muted-foreground/30">-</span>;
+    
+    const statusMap = {
+      'Present': { label: 'P', color: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' },
+      'Absent': { label: 'A', color: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' },
+      'Late': { label: 'L', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' },
+      'On Leave': { label: 'O', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' },
+      'Holiday': { label: 'H', color: 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400' },
+    };
 
-  const paginatedStudents = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredStudents.slice(startIndex, startIndex + pageSize);
-  }, [filteredStudents, currentPage, pageSize]);
+    const config = statusMap[status] || { label: '?', color: 'bg-gray-100 text-gray-700' };
 
-  const totalPages = Math.ceil(filteredStudents.length / pageSize);
-
-  if (!allStudents || allStudents.length === 0) {
     return (
-      <EmptyState 
-        icon={UserSearch}
-        title="No students data available"
-        description="Please search with filters first or add some students to this category."
-      />
+      <div className={`w-6 h-6 rounded-full ${config.color} flex items-center justify-center mx-auto`}>
+        <span className="text-xs font-bold">{config.label}</span>
+      </div>
     );
-  }
+  };
+
   return (
     <div>
-      {/* Filter Input */}
-      <div className="p-4 border-t border-x rounded-t-lg shadow-sm">
+      {/* Filter Input & Legend */}
+      <div className="p-4 border-t border-x rounded-t-lg shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Input
           id="student-filter"
           name="student-filter"
@@ -207,6 +214,30 @@ function StudentAttendanceGrid({
           onChange={(e) => setFilterText(e.target.value)}
           className="w-full sm:max-w-xs"
         />
+        
+        <div className="flex flex-wrap gap-3 items-center text-xs">
+          <span className="font-bold text-muted-foreground mr-1 uppercase">Legend:</span>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 flex items-center justify-center font-bold">P</div>
+            <span>Present</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 flex items-center justify-center font-bold">A</div>
+            <span>Absent</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 flex items-center justify-center font-bold">L</div>
+            <span>Late</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center font-bold">O</div>
+            <span>On Leave</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400 flex items-center justify-center font-bold">H</div>
+            <span>Holiday</span>
+          </div>
+        </div>
       </div>
 
       {/* Table Container with Force-Hidden Scrollbars */}
@@ -258,8 +289,33 @@ function StudentAttendanceGrid({
                 paginatedStudents.map((student) => (
                   <tr key={student.id} className="group hover:bg-muted/50 transition-colors">
                     {/* Sticky Student Name Cell */}
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-foreground sticky left-0 z-10 bg-background group-hover:bg-muted/80 border-r min-w-[120px] sm:min-w-[200px] truncate shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-                      {student.name}
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-foreground sticky left-0 z-40 bg-background group-hover:bg-muted/80 border-r min-w-[120px] sm:min-w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] group/name">
+                      <div className="truncate">
+                        {student.name}
+                      </div>
+                      
+                      {/* Hover Info Card */}
+                      <div className="hidden group-hover/name:block absolute left-[80%] top-1/2 -translate-y-1/2 z-[100] p-3 bg-card border rounded-lg shadow-xl w-48 font-normal whitespace-normal animate-in fade-in zoom-in duration-200 pointer-events-none">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b border-border/50 pb-1 mb-1">Student Info</p>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-muted-foreground">Course:</span>
+                              <span className="font-medium text-right ml-2">{student.course}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-muted-foreground">Branch:</span>
+                              <span className="font-medium text-right ml-2">{student.branch}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-muted-foreground">Year:</span>
+                              <span className="font-medium text-right ml-2">{student.year}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Little triangle arrow */}
+                        <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-card border-l border-b rotate-45 border-border"></div>
+                      </div>
                     </td>
                     {/* Attendance Cells */}
                     {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
@@ -268,7 +324,7 @@ function StudentAttendanceGrid({
                           studentAttendance[student.id]?.attendance[day];
                         const pendingAttendance =
                           attendance[student.id]?.[day];
-                        const displayAttendance =
+                        const displayStatus =
                           pendingAttendance !== undefined
                             ? pendingAttendance
                             : recordedAttendance;
@@ -280,29 +336,15 @@ function StudentAttendanceGrid({
                         const canInteractWithDay = isEditing && !isFutureDay;
                         if (canInteractWithDay) {
                           renderContent = (
-                            <AttendanceCheckbox
+                            <AttendanceStatusSelect
                               studentId={student.id}
                               day={day}
                               onAttendanceChange={onAttendanceChange}
-                              initialPresent={displayAttendance}
+                              initialStatus={displayStatus}
                             />
                           );
                         } else {
-                          if (displayAttendance === true) {
-                            renderContent = (
-                              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
-                                <span className="text-xs font-bold text-green-700 dark:text-green-400">P</span>
-                              </div>
-                            );
-                          } else if (displayAttendance === false) {
-                            renderContent = (
-                              <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
-                                <span className="text-xs font-bold text-red-700 dark:text-red-400">A</span>
-                              </div>
-                            );
-                          } else {
-                            renderContent = <span className="text-muted-foreground/30">-</span>;
-                          }
+                          renderContent = getStatusDisplay(displayStatus);
                         }
                         return (
                           <td
@@ -320,9 +362,15 @@ function StudentAttendanceGrid({
                 <tr>
                   <td
                     colSpan={daysInMonth + 1}
-                    className="px-4 py-8 text-center text-muted-foreground"
+                    className="px-4 py-20 text-center"
                   >
-                    No students found
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <div className="p-3 rounded-full bg-muted">
+                        <UserSearch className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-lg font-semibold text-foreground">No students found</p>
+                      <p className="text-sm text-muted-foreground">Try adjusting your filters or search terms.</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -384,7 +432,6 @@ function StudentAttendanceGrid({
             {loading ? "Saving..." : "Save Attendance"}
           </Button>
         )}
-
       </div>
     </div>
   );

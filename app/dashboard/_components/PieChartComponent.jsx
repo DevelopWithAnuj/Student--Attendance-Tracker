@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pie, PieChart, ResponsiveContainer, Legend } from 'recharts';
+import { Pie, PieChart, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import EmptyState from './EmptyState';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
@@ -25,24 +25,29 @@ function PieChartComponent({ attendance }) {
   useEffect(() => {
     setIsMounted(true);
     if (attendance && attendance.length > 0) {
-      let totalPresent = 0;
-      let totalAbsent = 0;
+      const counts = {
+        'Present': 0,
+        'Absent': 0,
+        'Late': 0,
+        'On Leave': 0,
+        'Holiday': 0,
+      };
 
       attendance.forEach(record => {
-        if (record.attendance.present) {
-          totalPresent++;
-        } else {
-          totalAbsent++;
+        const status = record.attendance.status;
+        if (counts[status] !== undefined) {
+          counts[status]++;
         }
       });
 
       const chartData = [
-        { name: 'Present', value: totalPresent },
-        { name: 'Absent', value: totalAbsent },
-      ].map((entry, index) => ({
-        ...entry,
-        fill: COLORS[index % COLORS.length]
-      }));
+        { name: 'Present', value: counts['Present'], fill: '#4ade80' },
+        { name: 'Absent', value: counts['Absent'], fill: '#ef4444' },
+        { name: 'Late', value: counts['Late'], fill: '#facc15' },
+        { name: 'On Leave', value: counts['On Leave'], fill: '#60a5fa' },
+        { name: 'Holiday', value: counts['Holiday'], fill: '#9ca3af' },
+      ].filter(item => item.value > 0);
+      
       setData(chartData);
     } else {
         setData([]);
@@ -54,8 +59,8 @@ function PieChartComponent({ attendance }) {
   return (
     <div className="mt-4 p-5 border rounded-lg shadow-sm dark:shadow-dark-sm bg-background">
       <h3 className="text-xl my-2 font-semibold mb-2">Monthly Attendance Summary</h3>
-      {data && data.length > 0 && (data[0].value > 0 || data[1].value > 0) ? (
-        <ResponsiveContainer width="100%" aspect={1}>
+      {data && data.length > 0 && data.some(item => item.value > 0) ? (
+        <ResponsiveContainer width="100%" aspect={1.5}>
           <PieChart>
             <Pie
               data={data}
@@ -63,11 +68,12 @@ function PieChartComponent({ attendance }) {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={80}
-              labelLine={false}
-              label={renderCustomizedLabel}
+              outerRadius={120}
+              labelLine={true}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             />
-            <Legend />
+            <Legend verticalAlign="bottom" height={36}/>
+            <Tooltip />
           </PieChart>
         </ResponsiveContainer>
       ) : (

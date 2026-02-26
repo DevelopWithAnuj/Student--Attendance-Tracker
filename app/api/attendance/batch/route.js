@@ -22,7 +22,7 @@ export async function POST(req) {
         if (existing) {
           await tx
             .update(attendance)
-            .set({ present: item.present })
+            .set({ status: item.status })
             .where(eq(attendance.id, existing.id));
         } else {
           await tx.insert(attendance).values(item);

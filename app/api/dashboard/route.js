@@ -1,7 +1,7 @@
 import { db } from "@/utils/db";
 import { attendance, students, branches, courses, years } from "@/utils/schema";
 import { NextResponse } from "next/server";
-import { eq, and, count, gte, lte } from "drizzle-orm";
+import { eq, and, count, gte, lte, sql } from "drizzle-orm";
 import moment from "moment";
 
 export async function GET(req) {
@@ -20,7 +20,14 @@ export async function GET(req) {
     if (monthParam) {
       const [m, y] = monthParam.split("/");
       const startDate = moment(`${y}-${m}-01`).format("YYYY-MM-DD");
-      const endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+      let endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+      
+      // If the selected month is the current month, cap at today
+      const today = moment().format("YYYY-MM-DD");
+      if (moment(startDate).isSame(moment(), 'month')) {
+          endDate = today;
+      }
+
       conditions.push(
         and(gte(attendance.date, startDate), lte(attendance.date, endDate))
       );
@@ -30,8 +37,11 @@ export async function GET(req) {
         const summary = await db
             .select({
                 totalAttendanceRecords: count(attendance.id),
-                totalPresentMarks: count(eq(attendance.present, true)),
-                totalAbsentMarks: count(eq(attendance.present, false)),
+                totalPresentMarks: count(sql`case when status = 'Present' then 1 end`),
+                totalAbsentMarks: count(sql`case when status = 'Absent' then 1 end`),
+                totalLateMarks: count(sql`case when status = 'Late' then 1 end`),
+                totalOnLeaveMarks: count(sql`case when status = 'On Leave' then 1 end`),
+                totalHolidayMarks: count(sql`case when status = 'Holiday' then 1 end`),
             })
             .from(attendance)
             .leftJoin(students, eq(students.id, attendance.studentId))

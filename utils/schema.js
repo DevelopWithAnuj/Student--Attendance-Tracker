@@ -19,7 +19,7 @@ export const attendance = pgTable("attendance", {
   studentId: integer("student_id").references(() => students.id, { onDelete: "cascade" }),
   day: integer("day").notNull(),
   date: date("date").notNull(),
-  present: boolean("present").notNull().default(true),
+  status: varchar("status", { length: 20 }).notNull().default("Present"),
   createdAt: timestamp("created_at", { withTimezone: true }),
 });
 

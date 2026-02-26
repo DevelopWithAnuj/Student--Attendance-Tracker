@@ -21,7 +21,12 @@ export async function GET(request) {
 
     const [m, y] = monthParam.split("/");
     const startDate = moment(`${y}-${m}-01`).format("YYYY-MM-DD");
-    const endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+    let endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+
+    // If the selected month is the current month, cap at today
+    if (moment(startDate).isSame(moment(), 'month')) {
+        endDate = moment().format("YYYY-MM-DD");
+    }
 
     const conditions = [
       gte(attendance.date, startDate),
@@ -46,7 +51,7 @@ export async function GET(request) {
     const dailyAttendance = await db
       .select({
         date: attendance.date,
-        presentCount: sql`count(case when present then 1 end)`,
+        presentCount: sql`count(case when status = 'Present' then 1 end)`,
         totalCount: sql`count(*)`,
       })
       .from(attendance)
@@ -56,7 +61,7 @@ export async function GET(request) {
 
     const trendData = dailyAttendance.map((day) => ({
       date: moment(day.date).format("DD"),
-      percentage: (day.presentCount / day.totalCount) * 100,
+      percentage: Math.round((day.presentCount / day.totalCount) * 100),
     }));
 
     return NextResponse.json({ result: trendData });

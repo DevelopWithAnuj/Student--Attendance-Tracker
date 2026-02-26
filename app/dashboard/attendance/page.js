@@ -12,6 +12,7 @@ import StudentAttendanceGrid from "./_components/StudentAttendanceGrid";
 import { LucideHand, SearchIcon, SquareArrowDownIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton"; 
 import { toast } from "sonner";
+import DailyAttendanceModal from "./_components/DailyAttendanceModal";
 
 function Attendance() {  const [loading, setLoading] = useState(false);
   const onSearchHandler = async () => {
@@ -84,11 +85,16 @@ function Attendance() {  const [loading, setLoading] = useState(false);
           (att) =>
             att.students.id === student.id && att.attendance.date === date,
         );
+        const statusMap = {
+          'Present': 'P',
+          'Absent': 'A',
+          'Late': 'L',
+          'On Leave': 'O',
+          'Holiday': 'H'
+        };
         row.push(
           attendanceRecord
-            ? attendanceRecord.attendance.present
-              ? "P"
-              : "A"
+            ? statusMap[attendanceRecord.attendance.status] || '?'
             : "-",
         );
       }
@@ -224,18 +230,23 @@ function Attendance() {  const [loading, setLoading] = useState(false);
             onYearChange={(value) => setSelectedYear(value)}
           />
         </div>
-        <Button className="self-end" onClick={() => onSearchHandler()}>
-        <SearchIcon className="h-4 w-4 mr-1" />
-          Search
-        </Button>
         <Button className="self-end" onClick={() => onExportCsv()}>
           <SquareArrowDownIcon className="h-4 w-4 mr-1" />
-          Export to CSV
+          Export Table to CSV
         </Button>
         <Button className="self-end" onClick={() => onExportPdf()}>
           <SquareArrowDownIcon className="h-4 w-4 mr-1" />
           Export to PDF
         </Button>
+        <div className="self-end">
+          <DailyAttendanceModal 
+            allStudents={allStudents}
+            selectedBranch={selectedBranch}
+            selectedCourse={selectedCourse}
+            selectedYear={selectedYear}
+            reFetchData={onSearchHandler}
+          />
+        </div>
       </div>
 
       {loading ? (

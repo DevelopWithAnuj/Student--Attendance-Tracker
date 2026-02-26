@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [allStudents, setAllStudents] = useState([]);
   const [trendData, setTrendData] = useState([]);
   const [dashboardSummary, setDashboardSummary] = useState({});
-  const { addNotification } = useNotifications();
+  const { setBulkNotifications, clearNotifications } = useNotifications();
 
   // Loading states for each data fetch
   const [dropdownLoading, setDropdownLoading] = useState(true);
@@ -45,47 +45,97 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchAllDropdownData(); // Fetch initial dropdown data
-    fetchAllStudents();
   }, []);
 
   useEffect(() => {
-    if (!overallLoading && allStudents.length > 0 && attendanceList.length > 0) {
-      const attendanceThreshold = 75; // 75%
-      const studentAttendance = {};
+    
+    if (
+      !dropdownLoading &&
+      selectedBranch !== "" &&
+      selectedCourse !== "" &&
+      selectedYear !== "" &&
+      selectedMonth
+    ) {
+      clearNotifications(); // Clear bubbles immediately when options change
+      fetchAllStudents();
+      getStudentAttendance();
+      GetDashboardSummary();
+      getAttendanceTrend();
+    }
+  }, [selectedMonth, selectedBranch, selectedCourse, selectedYear, dropdownLoading]);
 
-      attendanceList.forEach((record) => {
-        if (!studentAttendance[record.students.id]) {
-          studentAttendance[record.students.id] = {
-            present: 0,
-            total: 0,
-            name: record.students.name,
-          };
-        }
-        studentAttendance[record.students.id].total++;
-        if (record.attendance.present) {
-          studentAttendance[record.students.id].present++;
-        }
-      });
+  useEffect(() => {
+    // If we are still loading, don't calculate yet
+    if (overallLoading) return;
 
-      Object.keys(studentAttendance).forEach((studentId) => {
-        const student = studentAttendance[studentId];
-        const percentage = (student.present / student.total) * 100;
+    // If we have no students for the selected options, clear notifications
+    if (allStudents.length === 0) {
+      clearNotifications();
+      return;
+    }
+
+    const attendanceThreshold = 75; // 75%
+    const studentAttendance = {};
+    const newAlerts = [];
+
+    // Initialize all students
+    allStudents.forEach(student => {
+      studentAttendance[student.id] = {
+        present: 0,
+        late: 0,
+        holiday: 0,
+        total: 0,
+        name: student.name,
+      };
+    });
+
+    // Populate attendance data
+    attendanceList.forEach((record) => {
+      const studentId = record.students.id;
+      if (studentAttendance[studentId]) {
+        studentAttendance[studentId].total++;
+        const status = record.attendance.status;
+        if (status === 'Present') studentAttendance[studentId].present++;
+        else if (status === 'Late') studentAttendance[studentId].late++;
+        else if (status === 'Holiday') studentAttendance[studentId].holiday++;
+      }
+    });
+
+    Object.keys(studentAttendance).forEach((studentId) => {
+      const student = studentAttendance[studentId];
+      const effectiveTotal = student.total - student.holiday;
+      
+      if (student.total === 0) {
+        newAlerts.push({
+          title: `No Attendance: ${student.name}`,
+          message: "No attendance has been marked for this student this month.",
+        });
+      } else if (effectiveTotal > 0) {
+        const percentage = ((student.present + student.late) / effectiveTotal) * 100;
         if (percentage < attendanceThreshold) {
-          addNotification({
-            title: "Low Attendance Warning",
-            message: `${student.name} has low attendance: ${percentage.toFixed(
-              2,
-            )}%`,
+          newAlerts.push({
+            title: `Low Attendance: ${student.name}`,
+            message: `${percentage.toFixed(1)}% attendance. (P:${student.present}, L:${student.late}, Total:${effectiveTotal})`,
           });
         }
-      });
+      }
+    });
+
+    if (newAlerts.length > 0) {
+      setBulkNotifications(newAlerts);
+    } else {
+      clearNotifications();
     }
   }, [allStudents, attendanceList, overallLoading]);
 
   const fetchAllStudents = async () => {
     setStudentsLoading(true);
     try {
-      const studentsResponse = await GlobalApi.GetAllStudents(null, null, null);
+      const studentsResponse = await GlobalApi.GetAllStudents(
+        selectedBranch === "All" ? null : selectedBranch,
+        selectedCourse === "All" ? null : selectedCourse,
+        selectedYear === "All" ? null : selectedYear,
+      );
       setAllStudents(studentsResponse.data.result);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -195,21 +245,6 @@ const Dashboard = () => {
       });
   };
 
-  useEffect(() => {
-    if (
-      !dropdownLoading &&
-      !studentsLoading &&
-      selectedBranch !== "" &&
-      selectedCourse !== "" &&
-      selectedYear !== "" &&
-      selectedMonth
-    ) {
-      getStudentAttendance();
-      GetDashboardSummary();
-      getAttendanceTrend();
-    }
-  }, [selectedMonth, selectedBranch, selectedCourse, selectedYear, dropdownLoading, studentsLoading]);
-
   return (
     <div className="p-4 sm:p-6 md:p-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -282,7 +317,7 @@ const Dashboard = () => {
       ) : (
         <>
           <StatusList attendanceList={attendanceList} />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
             <div className="md:col-span-2">
               <BarChartComponent attendance={attendanceList} />
             </div>
@@ -290,7 +325,7 @@ const Dashboard = () => {
               <PieChartComponent attendance={attendanceList} />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-4 md:col-span-1">
             <TrendChartComponent data={trendData} />
           </div>
         </>

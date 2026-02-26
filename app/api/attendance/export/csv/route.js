@@ -37,7 +37,7 @@ export async function GET(request) {
         branch: branches.name,
         year: years.value,
         date: attendance.date,
-        present: attendance.present,
+        status: attendance.status,
       })
       .from(attendance)
       .innerJoin(students, eq(students.id, attendance.studentId))

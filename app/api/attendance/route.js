@@ -21,7 +21,13 @@ export async function GET(request) {
     if (monthParam) {
       const [m, y] = monthParam.split("/");
       const startDate = moment(`${y}-${m}-01`).format("YYYY-MM-DD");
-      const endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+      let endDate = moment(startDate).endOf("month").format("YYYY-MM-DD");
+
+      // If current month, cap at today
+      if (moment(startDate).isSame(moment(), 'month')) {
+          endDate = moment().format("YYYY-MM-DD");
+      }
+
       conditions.push(
         and(gte(attendance.date, startDate), lte(attendance.date, endDate))
       );
@@ -42,7 +48,7 @@ export async function GET(request) {
         attendance: {
           id: attendance.id,
           date: attendance.date,
-          present: attendance.present,
+          status: attendance.status,
         },
       })
       .from(attendance)
@@ -81,7 +87,7 @@ export async function POST(req) {
     if (existing) {
       const [updated] = await db
         .update(attendance)
-        .set({ present: data.present })
+        .set({ status: data.status })
         .where(eq(attendance.id, existing.id))
         .returning();
       return NextResponse.json({ data: updated });

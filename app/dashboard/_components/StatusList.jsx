@@ -2,6 +2,7 @@ import { getUniqueRecord } from "@/app/_services/service";
 import React, { useEffect, useState } from "react";
 import Card from "./Card";
 import { GraduationCapIcon, TrendingDown, TrendingUp } from "lucide-react";
+import moment from "moment";
 
 function StatusList({ attendanceList }) {
   // Fixed typo
@@ -13,16 +14,24 @@ function StatusList({ attendanceList }) {
 
   useEffect(() => {
     if (attendanceList && attendanceList.length > 0) {
-      const uniqueStudents = getUniqueRecord(attendanceList);
+      const today = moment().endOf("day");
+      
+      // Filter records to only include those up to today
+      const filteredList = attendanceList.filter(record => 
+        moment(record.attendance.date).isSameOrBefore(today)
+      );
+
+      const uniqueStudents = getUniqueRecord(filteredList);
       setTotalStudentsWithRecords(uniqueStudents.length);
-      setTotalRecords(attendanceList.length);
+      setTotalRecords(filteredList.length);
 
       let totalPresentMarks = 0;
       let totalAbsentMarks = 0;
-      attendanceList.forEach((record) => {
-        if (record.attendance?.present === true) {
+      
+      filteredList.forEach((record) => {
+        if (record.attendance?.status === 'Present') {
           totalPresentMarks++;
-        } else if (record.attendance?.present === false) {
+        } else if (record.attendance?.status === 'Absent') {
           totalAbsentMarks++;
         }
       });
@@ -30,9 +39,11 @@ function StatusList({ attendanceList }) {
       setTotalPresent(totalPresentMarks);
       setTotalAbsent(totalAbsentMarks);
 
-      // Calculate overall present percentage based on records
-      const calculatedPresentPerc =
-        (totalPresentMarks / attendanceList.length) * 100;
+      // Calculate overall present percentage based on filtered records
+      const calculatedPresentPerc = filteredList.length > 0 
+        ? (totalPresentMarks / filteredList.length) * 100
+        : 0;
+        
       setPresentPercentage(calculatedPresentPerc.toFixed(2)); // To 2 decimal places
     } else {
       setTotalStudentsWithRecords(0);

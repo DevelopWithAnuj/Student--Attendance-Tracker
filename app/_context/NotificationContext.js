@@ -27,9 +27,22 @@ export const NotificationProvider = ({ children }) => {
           ...notification,
           id: newId,
           read: false,
+          timestamp: new Date().toLocaleTimeString(),
         },
       ];
     });
+  };
+
+  const setBulkNotifications = (newNotifications) => {
+    // This replaces current notifications with a new set, 
+    // ensuring we don't just keep appending to the old list.
+    const notificationsWithMetadata = newNotifications.map((n, index) => ({
+      ...n,
+      id: notificationIdCounter.current++,
+      read: false,
+      timestamp: new Date().toLocaleTimeString(),
+    }));
+    setNotifications(notificationsWithMetadata);
   };
 
   const markAsRead = (id) => {
@@ -38,11 +51,15 @@ export const NotificationProvider = ({ children }) => {
     );
   };
 
+  const clearNotifications = () => {
+    setNotifications([]);
+  };
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, addNotification, markAsRead, unreadCount }}
+      value={{ notifications, addNotification, setBulkNotifications, markAsRead, clearNotifications, unreadCount }}
     >
       {children}
     </NotificationContext.Provider>
